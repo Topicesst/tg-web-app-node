@@ -17,18 +17,18 @@ bot.on('message', async (msg) => {
     const text = msg.text;
 
     if(text === '/start') {
-        await bot.sendMessage(chatId, 'Ниже появится кнопка, заполни форму', {
+        await bot.sendMessage(chatId, 'Нижче з\'явиться кнопка, заповніть форму', {
             reply_markup: {
                 keyboard: [
-                    [{text: 'Заполнить форму', web_app: {url: webAppUrl + '/form'}}]
+                    [{text: 'Заповнити форму', web_app: {url: webAppUrl + 'form'}}]
                 ]
             }
         })
 
-        await bot.sendMessage(chatId, 'Заходи в наш интернет магазин по кнопке ниже', {
+        await bot.sendMessage(chatId, 'Заходьте в наш інтернет магазин за кнопкою нижче', {
             reply_markup: {
                 inline_keyboard: [
-                    [{text: 'Сделать заказ', web_app: {url: webAppUrl}}]
+                    [{text: 'Зробити замовлення', web_app: {url: webAppUrl}}]
                 ]
             }
         })
@@ -38,12 +38,14 @@ bot.on('message', async (msg) => {
         try {
             const data = JSON.parse(msg?.web_app_data?.data)
             console.log(data)
-            await bot.sendMessage(chatId, 'Спасибо за обратную связь!')
-            await bot.sendMessage(chatId, 'Ваша страна: ' + data?.country);
-            await bot.sendMessage(chatId, 'Ваша улица: ' + data?.street);
+            await bot.sendMessage(chatId, 'Дякуємо за надану інформацію! ')
+            await bot.sendMessage(chatId, 'Ваше ПІБ: ' + data?.name);
+            await bot.sendMessage(chatId, 'Ваш номер телефону: ' + data?.numberphone);
+            await bot.sendMessage(chatId, 'Ваше місто: ' + data?.country);
+            await bot.sendMessage(chatId, 'Ваша вулиця: ' + data?.street);
 
             setTimeout(async () => {
-                await bot.sendMessage(chatId, 'Всю информацию вы получите в этом чате');
+                await bot.sendMessage(chatId, 'Всю інформацію передано, тепер ви можете замовити їжу');
             }, 3000)
         } catch (e) {
             console.log(e);
@@ -57,9 +59,9 @@ app.post('/web-data', async (req, res) => {
         await bot.answerWebAppQuery(queryId, {
             type: 'article',
             id: queryId,
-            title: 'Успешная покупка',
+            title: 'Успішна покупка',
             input_message_content: {
-                message_text: ` Поздравляю с покупкой, вы приобрели товар на сумму ${totalPrice}, ${products.map(item => item.title).join(', ')}`
+                message_text: `Вітаю з покупкою! Ви придбали товар на суму ${totalPrice}, ${products.map(item => item.title).join(', ')}`
             }
         })
         return res.status(200).json({});
@@ -70,4 +72,4 @@ app.post('/web-data', async (req, res) => {
 
 const PORT = 8000;
 
-app.listen(PORT, () => console.log('server started on PORT ' + PORT))
+app.listen(PORT, () => console.log('сервер запущено на порту ' + PORT))
