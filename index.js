@@ -61,7 +61,7 @@ app.post('/web-data', async (req, res) => {
             id: queryId,
             title: 'Успішна покупка',
             input_message_content: {
-                message_text: `Вітаю з покупкою! Ви придбали товар на суму ${totalPrice}, ${products.map(item => item.title).join(', ')}`
+                message_text: `Вітаю з покупкою! Ви придбали їжу на суму ${totalPrice}, ${products.map(item => item.title).join(', ')}`
             }
         })
         return res.status(200).json({});
