@@ -1,2 +1,2 @@
-worker: npm start
-web: node index.js
+worker: npm install pm2 -g
+web: pm2 start index.js
