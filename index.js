@@ -1,5 +1,4 @@
 const TelegramBot = require('node-telegram-bot-api');
-const https = require('https');
 const express = require('express');
 const cors = require('cors');
 
@@ -72,9 +71,5 @@ app.post('/web-data', async (req, res) => {
         return res.status(500).json({});
     }
 });
-
-// app.listen(PORT, () => console.log('server started on PORT ' + PORT));
 const PORT = 8000;
-https.createServer(app).listen(PORT, () => {
-    console.log(`server is runing at port ${PORT}`);
-});
+app.listen(PORT, () => console.log('server started on PORT ' + PORT));
