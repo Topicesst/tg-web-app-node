@@ -2,8 +2,8 @@ const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 const cors = require('cors');
 
-const token = '';
-const webAppUrl = 'https://deft-caramel-01f656.netlify.app/';
+const token = '6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0';
+const webAppUrl =  'https://deft-caramel-01f656.netlify.app/';
 
 const bot = new TelegramBot(token, {polling: true});
 const app = express();
@@ -11,7 +11,7 @@ const app = express();
 app.use(express.json());
 const corsOptions = {
   origin: [
-    'https://deft-caramel-01f656.netlify.app', // тут адрес на фронт без слеша как тут
+    'https://deft-caramel-01f656.netlify.app',
   ],
   allowedHeaders: [
     'Origin', 
