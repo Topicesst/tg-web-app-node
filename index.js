@@ -9,7 +9,22 @@ const bot = new TelegramBot(token, {polling: true});
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+const corsOptions = {
+  origin: [
+    'https://deft-caramel-01f656.netlify.app', // тут адрес на фронт без слеша как тут
+  ],
+  allowedHeaders: [
+    'Origin', 
+    'X-Requested-With', 
+    'Content-Type', 
+    'Accept', 
+    'Authorization', 
+    'Cookies'
+  ],
+  methods: ['GET', 'PUT', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+  credentials: true
+};
+app.use(cors(corsOptions));
 
 bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
