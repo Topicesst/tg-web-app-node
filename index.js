@@ -2,7 +2,6 @@ const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 const cors = require('cors');
 
-// Replace the token with your actual token
 const token = '6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0';
 const webAppUrl = 'https://deft-caramel-01f656.netlify.app/';
 
@@ -24,9 +23,7 @@ bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text;
 
-  // Handle the '/start' command
   if (text === '/start') {
-    // Send a message with a button to fill out the form
     await bot.sendMessage(chatId, 'Нижче з\'явиться кнопка, заповніть форму', {
       reply_markup: {
         keyboard: [
@@ -37,19 +34,15 @@ bot.on('message', async (msg) => {
     });
   }
 
-  // Handle the form data reception
   if (msg?.web_app_data?.data) {
     try {
       const data = JSON.parse(msg.web_app_data.data);
-      // Send a message thanking the user and confirming the information received
      await bot.sendMessage(chatId, '*Дякуємо за надану інформацію!*', { parse_mode: 'Markdown' });
      await bot.sendMessage(chatId, `*Ваше ПІБ:* _${data?.name}_`, { parse_mode: 'Markdown' });
      await bot.sendMessage(chatId, `*Ваш номер телефону:* _${data?.numberphone}_`, { parse_mode: 'Markdown' });
      await bot.sendMessage(chatId, `*Ваше місто:* _${data?.country}_`, { parse_mode: 'Markdown' });
      await bot.sendMessage(chatId, `*Ваша вулиця:* _${data?.street}_`, { parse_mode: 'Markdown' });
 
-
-      // Send a message with a button to the online store after a delay
       setTimeout(async () => {
         await bot.sendMessage(chatId, 'Заходьте в наш інтернет магазин за кнопкою нижче', {
           reply_markup: {
@@ -58,14 +51,13 @@ bot.on('message', async (msg) => {
             ]
           }
         });
-      }, 3000); // Delay to simulate processing time
+      }, 3000); 
     } catch (e) {
       console.error(e);
     }
   }
 });
 
-// ...
 app.post('/web-data', async (req, res) => {
   const { queryId, products = [], totalPrice } = req.body;
   try {
@@ -80,7 +72,7 @@ app.post('/web-data', async (req, res) => {
           '*Що саме ви замовили:*',
           ...products.map(item => `• _${item.title}_`)
         ].join('\n'),
-        parse_mode: 'Markdown' // Tell Telegram to parse the message as Markdown
+        parse_mode: 'Markdown' 
       }
     });
     res.status(200).json({});
@@ -89,11 +81,7 @@ app.post('/web-data', async (req, res) => {
     res.status(500).json({});
   }
 });
-// ...
 
-
-
-// Start the Express server
 const PORT = 8000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
