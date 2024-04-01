@@ -64,7 +64,7 @@ bot.on('message', async (msg) => {
   }
 });
 
-// POST endpoint for the web data
+// ...
 app.post('/web-data', async (req, res) => {
   const { queryId, products = [], totalPrice } = req.body;
   try {
@@ -73,7 +73,12 @@ app.post('/web-data', async (req, res) => {
       id: queryId,
       title: 'Успішна покупка',
       input_message_content: {
-        message_text: `Вітаю з покупкою! Ви придбали їжу на суму ${totalPrice} ₴, ${products.map(item => item.title).join(', ')}`
+        message_text: [
+          '🎉 Вітаємо з покупкою!',
+          `Загальна сума замовлення: ${totalPrice}₴`,
+          'Що саме ви замовили:',
+          ...products.map(item => `• ${item.title}`)
+        ].join('\n')
       }
     });
     res.status(200).json({});
@@ -82,6 +87,8 @@ app.post('/web-data', async (req, res) => {
     res.status(500).json({});
   }
 });
+// ...
+
 
 // Start the Express server
 const PORT = 8000;
