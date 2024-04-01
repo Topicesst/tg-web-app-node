@@ -75,8 +75,8 @@ app.post('/web-data', async (req, res) => {
       input_message_content: {
         message_text: [
           '*Вітаємо з покупкою!* 🎉',
-          `*Загальна сума замовлення:* _${totalPrice}₴_`,
-          '*Що саме ви замовили:*',
+          `💸 *Загальна сума замовлення:* _${totalPrice}₴_`,
+          '🧺 *Що саме ви замовили:*',
           ...products.map(item => `• _${item.title}_`)
         ].join('\n'),
         parse_mode: 'Markdown' // Tell Telegram to parse the message as Markdown
