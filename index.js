@@ -42,11 +42,11 @@ bot.on('message', async (msg) => {
     try {
       const data = JSON.parse(msg.web_app_data.data);
       // Send a message thanking the user and confirming the information received
-      await bot.sendMessage(chatId, 'Дякуємо за надану інформацію!');
-      await bot.sendMessage(chatId, `Ваше ПІБ: ${data?.name}`);
-      await bot.sendMessage(chatId, `Ваш номер телефону: ${data?.numberphone}`);
-      await bot.sendMessage(chatId, `Ваше місто: ${data?.country}`);
-      await bot.sendMessage(chatId, `Ваша вулиця: ${data?.street}`);
+      await bot.sendMessage(chatId, '*Дякуємо за надану інформацію!*');
+      await bot.sendMessage(chatId, `*Ваше ПІБ:* _${data?.name}_`);
+      await bot.sendMessage(chatId, `*Ваш номер телефону:* _${data?.numberphone}_`);
+      await bot.sendMessage(chatId, `*Ваше місто:* _${data?.country}_`);
+      await bot.sendMessage(chatId, `*Ваша вулиця:* _${data?.street}_`);
 
       // Send a message with a button to the online store after a delay
       setTimeout(async () => {
