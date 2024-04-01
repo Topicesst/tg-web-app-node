@@ -41,12 +41,15 @@ bot.on('message', async (msg) => {
   if (msg?.web_app_data?.data) {
     try {
       const data = JSON.parse(msg.web_app_data.data);
-      console.log(data);
-      await bot.sendMessage(chatId, 'Дякуємо за надану інформацію! Очікуйте на продовження...');
+      // Send a message thanking the user and confirming the information received
+      await bot.sendMessage(chatId, 'Дякуємо за надану інформацію!');
+      await bot.sendMessage(chatId, `Ваше ПІБ: ${data?.name}`);
+      await bot.sendMessage(chatId, `Ваш номер телефону: ${data?.numberphone}`);
+      await bot.sendMessage(chatId, `Ваше місто: ${data?.country}`);
+      await bot.sendMessage(chatId, `Ваша вулиця: ${data?.street}`);
 
-      // Delay to simulate processing time
+      // Send a message with a button to the online store after a delay
       setTimeout(async () => {
-        // Send a message with a button to the online store
         await bot.sendMessage(chatId, 'Заходьте в наш інтернет магазин за кнопкою нижче', {
           reply_markup: {
             inline_keyboard: [
@@ -54,7 +57,7 @@ bot.on('message', async (msg) => {
             ]
           }
         });
-      }, 3000);
+      }, 3000); // Delay to simulate processing time
     } catch (e) {
       console.error(e);
     }
@@ -70,7 +73,7 @@ app.post('/web-data', async (req, res) => {
       id: queryId,
       title: 'Успішна покупка',
       input_message_content: {
-        message_text: `Вітаю з покупкою! Ви придбали їжу на суму ${totalPrice}, ${products.map(item => item.title).join(', ')}`
+        message_text: `Вітаю з покупкою! Ви придбали їжу на суму ${totalPrice} ₴, ${products.map(item => item.title).join(', ')}`
       }
     });
     res.status(200).json({});
