@@ -60,8 +60,10 @@ bot.on('message', async (msg) => {
 });
 
 app.post('/web-data', async (req, res) => {
-  const { queryId, products = [], totalPrice } = req.body;
+  // Додаємо deliveryPrice до деструктуризації req.body
+  const { queryId, products = [], totalPrice, deliveryPrice = 0 } = req.body;
   try {
+    const totalPriceIncludingDelivery = totalPrice + deliveryPrice; // Обчислення загальної суми з урахуванням доставки
     await bot.answerWebAppQuery(queryId, {
       type: 'article',
       id: queryId,
@@ -69,11 +71,13 @@ app.post('/web-data', async (req, res) => {
       input_message_content: {
         message_text: [
           '*Вітаємо з покупкою!*',
-          `*Загальна сума замовлення:* _${totalPrice}₴_`,
+          `*Сума замовлення:* _${totalPrice}₴_`,
+          `*Вартість доставки:* _${deliveryPrice}₴_`, // Використовуємо deliveryPrice
+          `*Загальна сума замовлення:* _${totalPriceIncludingDelivery}₴_`, // Використовуємо обчислену загальну суму
           '*Що саме ви замовили:*',
           ...products.map(item => `• _${item.title}_`)
         ].join('\n'),
-        parse_mode: 'Markdown' 
+        parse_mode: 'Markdown'
       }
     });
     res.status(200).json({});
@@ -82,6 +86,7 @@ app.post('/web-data', async (req, res) => {
     res.status(500).json({});
   }
 });
+
 
 const PORT = 8000;
 app.listen(PORT, () => {
