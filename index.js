@@ -60,6 +60,7 @@ bot.on('message', async (msg) => {
 });
 
 app.post('/web-data', async (req, res) => {
+  console.log('Отримані дані з запиту: ', req.body);
   const { queryId, products = [], totalPrice, deliveryPrice = 0 } = req.body;
   
   // Перетворюємо totalPrice та deliveryPrice в числа для обчислення.
