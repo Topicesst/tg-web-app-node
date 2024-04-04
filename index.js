@@ -2,7 +2,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 const cors = require('cors');
 
-const token = '6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0';
+const token = '6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0'; 
 const webAppUrl = 'https://deft-caramel-01f656.netlify.app/';
 
 const bot = new TelegramBot(token, { polling: true });
@@ -25,7 +25,7 @@ bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
   lastChatId = chatId; 
 
-  const text = msg.text;
+  const text = msg.text || ''; // Додали захист від undefined
 
   if (text === '/start') {
     await bot.sendMessage(chatId, 'Нижче з\'явиться кнопка, заповніть форму', {
@@ -36,10 +36,10 @@ bot.on('message', async (msg) => {
         one_time_keyboard: true
       }
     });
-  } else if (text.match(/\/echo (.+)/)) {
-    const [, echoText] = text.match(/\/echo (.+)/);
+  } else if (text.match(/^\/echo (.+)/)) { // Додали захист від помилок та ^ для вказівки на початок рядка
+    const [, echoText] = text.match(/^\/echo (.+)/);
     await bot.sendMessage(chatId, `Ви сказали: ${echoText}`);
-  } else if (msg?.web_app_data?.data) {
+  } else if (msg.web_app_data && msg.web_app_data.data) {
     try {
       const data = JSON.parse(msg.web_app_data.data);
       await bot.sendMessage(chatId, '*Дякуємо за надану інформацію!*', { parse_mode: 'Markdown' });
@@ -52,6 +52,7 @@ bot.on('message', async (msg) => {
       console.error(e);
     }
   }
+  // Можлива інша логіка обробки повідомлень
 });
 
 app.post('/web-data', async (req, res) => {
@@ -72,6 +73,7 @@ app.post('/web-data', async (req, res) => {
       }
     });
 
+    // Відправка повідомлення з загальною сумою замовлення, включаючи доставку
     if (lastChatId) {
       await bot.sendMessage(lastChatId, `*Загальна сума замовлення включаючи доставку:* _${totalPrice}₴_`, { parse_mode: 'Markdown' });
     }
