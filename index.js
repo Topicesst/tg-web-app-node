@@ -64,6 +64,10 @@ bot.on('message', async (msg) => {
 
 app.post('/web-data', async (req, res) => {
     const { queryId, products = [], totalPrice, deliveryPrice } = req.body;
+    
+    // Вивести дані, що надійшли на сервер для перевірки
+    console.log('Received data:', req.body);
+
     try {
         await bot.answerWebAppQuery(queryId, {
             type: 'article',
