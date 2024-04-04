@@ -51,12 +51,12 @@ bot.on('message', async (msg) => {
       }
       
       await bot.sendMessage(chatId, '*Дякуємо за надану інформацію!*', { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, *Ваше ПІБ:* _${data?.name}_, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, *Ваш номер телефону:* _${data?.numberphone}_, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, *Ваше місто:* _${data?.city}_, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, *Ваша адреса:* _${data?.street}_, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, *Метод доставки:* _${deliveryMethodText}_, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, *Вартість доставки:* _${data?.deliveryPrice}_, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*Ваше ПІБ:* _${data?.name}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*Ваш номер телефону:* _${data?.numberphone}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*Ваше місто:* _${data?.city}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*Ваша адреса:* _${data?.street}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*Метод доставки:* _${deliveryMethodText}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*Вартість доставки:* _${data?.deliveryPrice}_`, { parse_mode: 'Markdown' });
 
       setTimeout(async () => {
         await bot.sendMessage(chatId, 'Заходьте в наш інтернет магазин за кнопкою нижче', {
@@ -83,9 +83,9 @@ app.post('/web-data', async (req, res) => {
       input_message_content: {
         message_text: [
           '*Вітаємо з покупкою!*',
-          *Сума замовлення:* _${totalPrice}₴_,
+          `*Сума замовлення:* _${totalPrice}₴_`,
           '*Що саме ви замовили:*',
-          ...products.map(item => • _${item.title}_)
+          ...products.map(item => `• _${item.title}_`)
         ].join('\n'),
         parse_mode: 'Markdown' 
       }
@@ -99,5 +99,5 @@ app.post('/web-data', async (req, res) => {
 
 const PORT = 8000;
 app.listen(PORT, () => {
-  console.log(Server is running on port ${PORT});
+  console.log(`Server is running on port ${PORT}`);
 });
