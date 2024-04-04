@@ -40,7 +40,7 @@ bot.on('message', async (msg) => {
      await bot.sendMessage(chatId, '*Дякуємо за надану інформацію!*', { parse_mode: 'Markdown' });
      await bot.sendMessage(chatId, `*Ваше ПІБ:* _${data?.name}_`, { parse_mode: 'Markdown' });
      await bot.sendMessage(chatId, `*Ваш номер телефону:* _${data?.numberphone}_`, { parse_mode: 'Markdown' });
-     await bot.sendMessage(chatId, `*Ваше місто:* _${data?.country}_`, { parse_mode: 'Markdown' });
+     await bot.sendMessage(chatId, `*Ваше місто:* _${data?.city}_`, { parse_mode: 'Markdown' });
      await bot.sendMessage(chatId, `*Ваша адреса:* _${data?.street}_`, { parse_mode: 'Markdown' });
      await bot.sendMessage(chatId, `*Вартість доставки:* _${data?.deliveryMethod}_`, { parse_mode: 'Markdown' });
       
