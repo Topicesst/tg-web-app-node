@@ -60,10 +60,16 @@ bot.on('message', async (msg) => {
 });
 
 app.post('/web-data', async (req, res) => {
-  // Додаємо deliveryPrice до деструктуризації req.body
   const { queryId, products = [], totalPrice, deliveryPrice = 0 } = req.body;
+  
+  // Перетворюємо totalPrice та deliveryPrice в числа для обчислення.
+  const numericTotalPrice = Number(totalPrice);
+  const numericDeliveryPrice = Number(deliveryPrice);
+
+  // Обчислюємо загальну суму замовлення з урахуванням доставки.
+  const totalPriceIncludingDelivery = numericTotalPrice + numericDeliveryPrice;
+
   try {
-    const totalPriceIncludingDelivery = totalPrice + deliveryPrice; // Обчислення загальної суми з урахуванням доставки
     await bot.answerWebAppQuery(queryId, {
       type: 'article',
       id: queryId,
@@ -71,9 +77,9 @@ app.post('/web-data', async (req, res) => {
       input_message_content: {
         message_text: [
           '*Вітаємо з покупкою!*',
-          `*Сума замовлення:* _${totalPrice}₴_`,
-          `*Вартість доставки:* _${deliveryPrice}₴_`, // Використовуємо deliveryPrice
-          `*Загальна сума замовлення:* _${totalPriceIncludingDelivery}₴_`, // Використовуємо обчислену загальну суму
+          `*Сума замовлення:* _${numericTotalPrice}₴_`,
+          `*Вартість доставки:* _${numericDeliveryPrice}₴_`, 
+          `*Загальна сума замовлення:* _${totalPriceIncludingDelivery}₴_`,
           '*Що саме ви замовили:*',
           ...products.map(item => `• _${item.title}_`)
         ].join('\n'),
@@ -86,7 +92,6 @@ app.post('/web-data', async (req, res) => {
     res.status(500).json({});
   }
 });
-
 
 const PORT = 8000;
 app.listen(PORT, () => {
