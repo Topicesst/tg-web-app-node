@@ -60,20 +60,7 @@ bot.on('message', async (msg) => {
 });
 
 app.post('/web-data', async (req, res) => {
-  const { queryId, products = [], totalPrice: rawTotalPrice, deliveryPrice: rawDeliveryPrice } = req.body;
-  
-  // Конвертація значень у числа
-  const totalPrice = parseFloat(rawTotalPrice);
-  const deliveryPrice = parseFloat(rawDeliveryPrice);
-
-  // Перевірка, чи є конвертовані значення дійсними числами
-  if (isNaN(totalPrice) || isNaN(deliveryPrice)) {
-    console.error('Одне зі значень не є числом');
-    return res.status(400).json({ error: 'Некоректне значення ціни або вартості доставки' });
-  }
-
-  const totalPayment = totalPrice + deliveryPrice;
-
+  const { queryId, products = [], totalPrice } = req.body;
   try {
     await bot.answerWebAppQuery(queryId, {
       type: 'article',
@@ -84,9 +71,7 @@ app.post('/web-data', async (req, res) => {
           '*Вітаємо з покупкою!*',
           `*Cума замовлення:* _${totalPrice}₴_`,
           '*Що саме ви замовили:*',
-          ...products.map(item => `• _${item.title}_`),
-          '', // Додаємо порожній рядок для кращого форматування
-          `*Загальна сума до сплати (з доставкою):* _${totalPayment}₴_` // Додаємо рядок з загальною сумою
+          ...products.map(item => `• _${item.title}_`)
         ].join('\n'),
         parse_mode: 'Markdown' 
       }
