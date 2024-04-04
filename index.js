@@ -61,7 +61,7 @@ bot.on('message', async (msg) => {
 });
 
 app.post('/web-data', async (req, res) => {
-  const { queryId, products = [], totalPrice, deliveryPrice } = req.body; // Додано параметр deliveryPrice
+  const { queryId, products = [], totalPrice } = req.body;
   try {
     await bot.answerWebAppQuery(queryId, {
       type: 'article',
@@ -71,7 +71,6 @@ app.post('/web-data', async (req, res) => {
         message_text: [
           '*Вітаємо з покупкою!*',
           `*Cума замовлення:* _${totalPrice}₴_`,
-          `*Вартість доставки:* _${deliveryPrice}_`, // Додано відображення вартості доставки
           '*Що саме ви замовили:*',
           ...products.map(item => `• _${item.title}_`)
         ].join('\n'),
