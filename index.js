@@ -63,33 +63,27 @@ bot.on('message', async (msg) => {
 });
 
 app.post('/web-data', async (req, res) => {
-    const { queryId, products = [], totalPrice, deliveryPrice } = req.body;
-    
-    // Вивести дані, що надійшли на сервер для перевірки
-    console.log('Received data:', req.body);
-
-    try {
-        await bot.answerWebAppQuery(queryId, {
-            type: 'article',
-            id: queryId,
-            title: 'Успішна покупка',
-            input_message_content: {
-                message_text: [
-                    '*Вітаємо з покупкою!*',
-                    `*Cума замовлення:* _${totalPrice}₴_`,
-                    '*Що саме ви замовили:*',
-                    ...products.map(item => `• _${item.title}_`),
-                    '', // Додаємо порожній рядок для кращого форматування
-                    `*Загальна сума до сплати (з доставкою):* _${totalPrice + deliveryPrice}₴_` // Додаємо рядок з загальною сумою
-                ].join('\n'),
-                parse_mode: 'Markdown'
-            }
-        });
-        res.status(200).json({});
-    } catch (e) {
-        console.error(e);
-        res.status(500).json({});
-    }
+  const { queryId, products = [], totalPrice } = req.body;
+  try {
+    await bot.answerWebAppQuery(queryId, {
+      type: 'article',
+      id: queryId,
+      title: 'Успішна покупка',
+      input_message_content: {
+        message_text: [
+          '*Вітаємо з покупкою!*',
+          `*Cума замовлення:* _${totalPrice}₴_`,
+          '*Що саме ви замовили:*',
+          ...products.map(item => `• _${item.title}_`)
+        ].join('\n'),
+        parse_mode: 'Markdown' 
+      }
+    });
+    res.status(200).json({});
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({});
+  }
 });
 
 const PORT = 8000;
