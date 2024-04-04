@@ -42,8 +42,8 @@ bot.on('message', async (msg) => {
      await bot.sendMessage(chatId, `*Ваш номер телефону:* _${data?.numberphone}_`, { parse_mode: 'Markdown' });
      await bot.sendMessage(chatId, `*Ваше місто:* _${data?.city}_`, { parse_mode: 'Markdown' });
      await bot.sendMessage(chatId, `*Ваша адреса:* _${data?.street}_`, { parse_mode: 'Markdown' });
-     await bot.sendMessage(chatId, `*Вартість доставки:* _${data?.deliveryPrice}_`, { parse_mode: 'Markdown' });
-
+     await bot.sendMessage(chatId, `*Вартість доставки:* _${data?.deliveryMethod}_`, { parse_mode: 'Markdown' });
+      
       setTimeout(async () => {
         await bot.sendMessage(chatId, 'Заходьте в наш інтернет магазин за кнопкою нижче', {
           reply_markup: {
@@ -60,16 +60,7 @@ bot.on('message', async (msg) => {
 });
 
 app.post('/web-data', async (req, res) => {
-  console.log('Отримані дані з запиту: ', req.body);
-  const { queryId, products = [], totalPrice, deliveryPrice = 0 } = req.body;
-  
-  // Перетворюємо totalPrice та deliveryPrice в числа для обчислення.
-  const numericTotalPrice = Number(totalPrice);
-  const numericDeliveryPrice = Number(deliveryPrice);
-
-  // Обчислюємо загальну суму замовлення з урахуванням доставки.
-  const totalPriceIncludingDelivery = numericTotalPrice + numericDeliveryPrice;
-
+  const { queryId, products = [], totalPrice } = req.body;
   try {
     await bot.answerWebAppQuery(queryId, {
       type: 'article',
@@ -78,13 +69,11 @@ app.post('/web-data', async (req, res) => {
       input_message_content: {
         message_text: [
           '*Вітаємо з покупкою!*',
-          `*Сума замовлення:* _${numericTotalPrice}₴_`,
-          `*Вартість доставки:* _${numericDeliveryPrice}₴_`, 
-          `*Загальна сума замовлення:* _${totalPriceIncludingDelivery}₴_`,
+          `*Cума замовлення:* _${totalPrice}₴_`,
           '*Що саме ви замовили:*',
           ...products.map(item => `• _${item.title}_`)
         ].join('\n'),
-        parse_mode: 'Markdown'
+        parse_mode: 'Markdown' 
       }
     });
     res.status(200).json({});
