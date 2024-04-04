@@ -2,7 +2,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 const cors = require('cors');
 
-const token = 'YOUR_TELEGRAM_BOT_TOKEN';
+const token = '6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0';
 const webAppUrl = 'https://deft-caramel-01f656.netlify.app/';
 
 const bot = new TelegramBot(token, { polling: true });
