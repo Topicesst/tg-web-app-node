@@ -73,7 +73,6 @@ app.post('/web-data', async (req, res) => {
         message_text: [
           '*Вітаємо з покупкою!*',
           `*Cума замовлення:* _${totalPrice}₴_`,
-            `*Cума доставки:* _${deliveryMethodText}₴_`,
           '*Що саме ви замовили:*',
           ...products.map(item => `• _${item.title}_`)
         ].join('\n'),
