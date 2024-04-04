@@ -2,7 +2,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 const cors = require('cors');
 
-const token = '6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0'; // Будь ласка, замініть на ваш реальний токен
+const token = '6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0'; // Замініть на ваш реальний токен
 const webAppUrl = 'https://deft-caramel-01f656.netlify.app/';
 
 const bot = new TelegramBot(token, { polling: true });
@@ -37,6 +37,7 @@ bot.on('message', async (msg) => {
   if (msg?.web_app_data?.data) {
     try {
       const data = JSON.parse(msg.web_app_data.data);
+      // Перетворення deliveryMethod на зрозумілий текст
       let deliveryMethodText = '';
       switch(data.deliveryMethod) {
         case 'courier':
@@ -50,12 +51,12 @@ bot.on('message', async (msg) => {
       }
       
       await bot.sendMessage(chatId, '*Дякуємо за надану інформацію!*', { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*Ваше ПІБ:* _${data?.name}_`, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*Ваш номер телефону:* _${data?.numberphone}_`, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*Ваше місто:* _${data?.city}_`, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*Ваша адреса:* _${data?.street}_`, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*Метод доставки:* _${deliveryMethodText}_`, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*Вартість доставки:* _${data?.deliveryPrice}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, *Ваше ПІБ:* _${data?.name}_, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, *Ваш номер телефону:* _${data?.numberphone}_, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, *Ваше місто:* _${data?.city}_, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, *Ваша адреса:* _${data?.street}_, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, *Метод доставки:* _${deliveryMethodText}_, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, *Вартість доставки:* _${data?.deliveryPrice}_, { parse_mode: 'Markdown' });
 
       setTimeout(async () => {
         await bot.sendMessage(chatId, 'Заходьте в наш інтернет магазин за кнопкою нижче', {
@@ -73,8 +74,7 @@ bot.on('message', async (msg) => {
 });
 
 app.post('/web-data', async (req, res) => {
-  const { queryId, products = [], totalPrice, deliveryMethod } = req.body;
-  let deliveryMethodText = deliveryMethod === 'courier' ? 'Доставка кур\'єром' : 'Самовивіз';
+  const { queryId, products = [], totalPrice } = req.body;
   try {
     await bot.answerWebAppQuery(queryId, {
       type: 'article',
@@ -83,12 +83,11 @@ app.post('/web-data', async (req, res) => {
       input_message_content: {
         message_text: [
           '*Вітаємо з покупкою!*',
-          `*Сума замовлення:* _${totalPrice}₴_`,
-          `*Метод доставки:* _${deliveryMethodText}_`,
+          *Сума замовлення:* _${totalPrice}₴_,
           '*Що саме ви замовили:*',
-          ...products.map(item => `• _${item.title}_`)
+          ...products.map(item => • _${item.title}_)
         ].join('\n'),
-        parse_mode: 'Markdown'
+        parse_mode: 'Markdown' 
       }
     });
     res.status(200).json({});
@@ -100,5 +99,5 @@ app.post('/web-data', async (req, res) => {
 
 const PORT = 8000;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(Server is running on port ${PORT});
 });
