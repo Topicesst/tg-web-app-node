@@ -42,8 +42,8 @@ bot.on('message', async (msg) => {
      await bot.sendMessage(chatId, `*Ваш номер телефону:* _${data?.numberphone}_`, { parse_mode: 'Markdown' });
      await bot.sendMessage(chatId, `*Ваше місто:* _${data?.city}_`, { parse_mode: 'Markdown' });
      await bot.sendMessage(chatId, `*Ваша адреса:* _${data?.street}_`, { parse_mode: 'Markdown' });
-     await bot.sendMessage(chatId, `*Вартість доставки:* _${data?.deliveryMethod}_`, { parse_mode: 'Markdown' });
-      
+     await bot.sendMessage(chatId, `*Вартість доставки:* _${data?.deliveryPrice}_`, { parse_mode: 'Markdown' });
+
       setTimeout(async () => {
         await bot.sendMessage(chatId, 'Заходьте в наш інтернет магазин за кнопкою нижче', {
           reply_markup: {
