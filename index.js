@@ -2,7 +2,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 const cors = require('cors');
 
-const token = '6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0'; // Замініть на ваш реальний токен
+const token = '6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0'; // Будь ласка, замініть на ваш реальний токен
 const webAppUrl = 'https://deft-caramel-01f656.netlify.app/';
 
 const bot = new TelegramBot(token, { polling: true });
@@ -37,7 +37,6 @@ bot.on('message', async (msg) => {
   if (msg?.web_app_data?.data) {
     try {
       const data = JSON.parse(msg.web_app_data.data);
-      // Перетворення deliveryMethod на зрозумілий текст
       let deliveryMethodText = '';
       switch(data.deliveryMethod) {
         case 'courier':
@@ -74,7 +73,8 @@ bot.on('message', async (msg) => {
 });
 
 app.post('/web-data', async (req, res) => {
-  const { queryId, products = [], totalPrice } = req.body;
+  const { queryId, products = [], totalPrice, deliveryMethod } = req.body;
+  let deliveryMethodText = deliveryMethod === 'courier' ? 'Доставка кур\'єром' : 'Самовивіз';
   try {
     await bot.answerWebAppQuery(queryId, {
       type: 'article',
@@ -84,10 +84,11 @@ app.post('/web-data', async (req, res) => {
         message_text: [
           '*Вітаємо з покупкою!*',
           `*Сума замовлення:* _${totalPrice}₴_`,
+          `*Метод доставки:* _${deliveryMethodText}_`,
           '*Що саме ви замовили:*',
           ...products.map(item => `• _${item.title}_`)
         ].join('\n'),
-        parse_mode: 'Markdown' 
+        parse_mode: 'Markdown'
       }
     });
     res.status(200).json({});
