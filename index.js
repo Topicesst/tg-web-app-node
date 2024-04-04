@@ -60,11 +60,21 @@ bot.on('message', async (msg) => {
 });
 
 app.post('/web-data', async (req, res) => {
-  const { queryId, products = [], totalPrice, deliveryPrice } = req.body;
-  try {
-    // Розрахунок загальної суми оплати
-    const totalPayment = totalPrice + deliveryPrice;
+  const { queryId, products = [], totalPrice: rawTotalPrice, deliveryPrice: rawDeliveryPrice } = req.body;
+  
+  // Конвертація значень у числа
+  const totalPrice = parseFloat(rawTotalPrice);
+  const deliveryPrice = parseFloat(rawDeliveryPrice);
 
+  // Перевірка, чи є конвертовані значення дійсними числами
+  if (isNaN(totalPrice) || isNaN(deliveryPrice)) {
+    console.error('Одне зі значень не є числом');
+    return res.status(400).json({ error: 'Некоректне значення ціни або вартості доставки' });
+  }
+
+  const totalPayment = totalPrice + deliveryPrice;
+
+  try {
     await bot.answerWebAppQuery(queryId, {
       type: 'article',
       id: queryId,
@@ -87,7 +97,6 @@ app.post('/web-data', async (req, res) => {
     res.status(500).json({});
   }
 });
-
 
 const PORT = 8000;
 app.listen(PORT, () => {
