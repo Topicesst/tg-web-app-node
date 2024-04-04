@@ -37,22 +37,12 @@ bot.on('message', async (msg) => {
   if (msg?.web_app_data?.data) {
     try {
       const data = JSON.parse(msg.web_app_data.data);
-      let deliveryPriceMessage = 'Вартість доставки: Не вказано';
-
-      // Розрахунок вартості доставки
-      if(data.deliveryMethod === 'courier') {
-        // Тут можна додати вашу логіку для розрахунку вартості доставки, наприклад:
-        deliveryPriceMessage = 'Вартість доставки: 50 грн'; // Приклад
-      } else if(data.deliveryMethod === 'pickup') {
-        deliveryPriceMessage = 'Ціна доставки: Безкоштовно';
-      }
-
      await bot.sendMessage(chatId, '*Дякуємо за надану інформацію!*', { parse_mode: 'Markdown' });
      await bot.sendMessage(chatId, `*Ваше ПІБ:* _${data?.name}_`, { parse_mode: 'Markdown' });
      await bot.sendMessage(chatId, `*Ваш номер телефону:* _${data?.numberphone}_`, { parse_mode: 'Markdown' });
      await bot.sendMessage(chatId, `*Ваше місто:* _${data?.city}_`, { parse_mode: 'Markdown' });
      await bot.sendMessage(chatId, `*Ваша адреса:* _${data?.street}_`, { parse_mode: 'Markdown' });
-     await bot.sendMessage(chatId, `*${deliveryPriceMessage}_`, { parse_mode: 'Markdown' });
+     await bot.sendMessage(chatId, `*Вартість доставки:* _${data?.deliveryMethod}_`, { parse_mode: 'Markdown' });
       
       setTimeout(async () => {
         await bot.sendMessage(chatId, 'Заходьте в наш інтернет магазин за кнопкою нижче', {
