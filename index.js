@@ -2,8 +2,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 const cors = require('cors');
 
-// Використовуйте ваш реальний токен бота
-const token = '6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0'; 
+const token = '6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0'; // Замініть на ваш реальний токен
 const webAppUrl = 'https://deft-caramel-01f656.netlify.app/';
 
 const bot = new TelegramBot(token, { polling: true });
@@ -12,7 +11,7 @@ const app = express();
 app.use(express.json());
 
 const corsOptions = {
-  origin: webAppUrl,
+  origin: 'https://deft-caramel-01f656.netlify.app',
   methods: ['GET', 'PUT', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
@@ -99,7 +98,7 @@ app.post('/web-data', async (req, res) => {
           '*Що саме ви замовили:*',
           ...products.map(item => `• _${item.title}_`)
         ].join('\n'),
-        parse_mode: 'Markdown'
+        parse_mode: 'Markdown' 
       }
     });
     res.status(200).json({});
