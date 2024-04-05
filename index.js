@@ -2,7 +2,8 @@ const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 const cors = require('cors');
 
-const token = '6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0'; // Замініть на ваш реальний токен
+// Використовуйте ваш реальний токен бота
+const token = '6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0'; 
 const webAppUrl = 'https://deft-caramel-01f656.netlify.app/';
 
 const bot = new TelegramBot(token, { polling: true });
@@ -11,7 +12,7 @@ const app = express();
 app.use(express.json());
 
 const corsOptions = {
-  origin: 'https://deft-caramel-01f656.netlify.app',
+  origin: webAppUrl,
   methods: ['GET', 'PUT', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
@@ -35,28 +36,32 @@ bot.on('message', async (msg) => {
   }
 
   if (msg?.web_app_data?.data) {
-  try {
-    const data = JSON.parse(msg.web_app_data.data);
-    // Перетворення deliveryMethod на зрозумілий текст
-    // Додавання логіки для приблизного часу доставки
-let deliveryTimeText;
-if (data.deliveryTime) {
-  const timeUnits = data.deliveryTime.includes("хвилин") ? "хвилин" : "годин";
-  deliveryTimeText = `Приблизно ${data.deliveryTime} ${timeUnits}`;
-} else {
-  deliveryTimeText = 'Час доставки не вказано';
-}
+    let deliveryMethodText = ''; // Перемістіть змінну на вищий рівень в контексті
+    try {
+      const data = JSON.parse(msg.web_app_data.data);
+      // Перетворення deliveryMethod на зрозумілий текст
+      switch(data.deliveryMethod) {
+        case 'courier':
+          deliveryMethodText = 'Доставка кур\'єром';
+          break;
+        case 'pickup':
+          deliveryMethodText = 'Самовивіз';
+          break;
+        default:
+          deliveryMethodText = 'Метод доставки не вибрано';
+      }
 
-await bot.sendMessage(chatId, '*Дякуємо за надану інформацію!*', { parse_mode: 'Markdown' });
-await bot.sendMessage(chatId, `*Ваше ПІБ:* _${data?.name}_`, { parse_mode: 'Markdown' });
-await bot.sendMessage(chatId, `*Ваш номер телефону:* _${data?.numberphone}_`, { parse_mode: 'Markdown' });
-await bot.sendMessage(chatId, `*Ваше місто:* _${data?.city}_`, { parse_mode: 'Markdown' });
-await bot.sendMessage(chatId, `*Ваша адреса:* _${data?.street}_`, { parse_mode: 'Markdown' });
-await bot.sendMessage(chatId, `*Метод доставки:* _${deliveryMethodText}_`, { parse_mode: 'Markdown' });
-await bot.sendMessage(chatId, `*Вартість доставки:* _${data?.deliveryPrice}_`, { parse_mode: 'Markdown' });
-// Відправка повідомлення з приблизним часом доставки
-await bot.sendMessage(chatId, `*Приблизний час доставки:* _${deliveryTimeText}_`, { parse_mode: 'Markdown' });
+      let deliveryTimeText = data.deliveryTime ? `Приблизно ${data.deliveryTime}` : 'Час доставки не вказано';
 
+      // Відправка повідомлень
+      await bot.sendMessage(chatId, '*Дякуємо за надану інформацію!*', { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*Ваше ПІБ:* _${data?.name}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*Ваш номер телефону:* _${data?.numberphone}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*Ваше місто:* _${data?.city}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*Ваша адреса:* _${data?.street}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*Метод доставки:* _${deliveryMethodText}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*Вартість доставки:* _${data?.deliveryPrice}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*Приблизний час доставки:* _${deliveryTimeText}_`, { parse_mode: 'Markdown' });
 
       setTimeout(async () => {
         await bot.sendMessage(chatId, 'Заходьте в наш інтернет магазин за кнопкою нижче', {
@@ -87,7 +92,7 @@ app.post('/web-data', async (req, res) => {
           '*Що саме ви замовили:*',
           ...products.map(item => `• _${item.title}_`)
         ].join('\n'),
-        parse_mode: 'Markdown' 
+        parse_mode: 'Markdown'
       }
     });
     res.status(200).json({});
