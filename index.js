@@ -38,30 +38,25 @@ bot.on('message', async (msg) => {
   try {
     const data = JSON.parse(msg.web_app_data.data);
     // Перетворення deliveryMethod на зрозумілий текст
-    let deliveryMethodText = '';
-    switch(data.deliveryMethod) {
-      case 'courier':
-        deliveryMethodText = 'Доставка кур\'єром';
-        break;
-      case 'pickup':
-        deliveryMethodText = 'Самовивіз';
-        break;
-      default:
-        deliveryMethodText = 'Метод доставки не вибрано';
-    }
-    
     // Додавання логіки для приблизного часу доставки
-    let deliveryTimeText = data.deliveryTime ? `Приблизно ${data.deliveryTime} годин` : 'Час доставки не вказано';
+let deliveryTimeText;
+if (data.deliveryTime) {
+  const timeUnits = data.deliveryTime.includes("хвилин") ? "хвилин" : "годин";
+  deliveryTimeText = `Приблизно ${data.deliveryTime} ${timeUnits}`;
+} else {
+  deliveryTimeText = 'Час доставки не вказано';
+}
 
-    await bot.sendMessage(chatId, '*Дякуємо за надану інформацію!*', { parse_mode: 'Markdown' });
-    await bot.sendMessage(chatId, `*Ваше ПІБ:* _${data?.name}_`, { parse_mode: 'Markdown' });
-    await bot.sendMessage(chatId, `*Ваш номер телефону:* _${data?.numberphone}_`, { parse_mode: 'Markdown' });
-    await bot.sendMessage(chatId, `*Ваше місто:* _${data?.city}_`, { parse_mode: 'Markdown' });
-    await bot.sendMessage(chatId, `*Ваша адреса:* _${data?.street}_`, { parse_mode: 'Markdown' });
-    await bot.sendMessage(chatId, `*Метод доставки:* _${deliveryMethodText}_`, { parse_mode: 'Markdown' });
-    await bot.sendMessage(chatId, `*Вартість доставки:* _${data?.deliveryPrice}_`, { parse_mode: 'Markdown' });
-    // Відправка повідомлення з приблизним часом доставки
-    await bot.sendMessage(chatId, `*Приблизний час доставки:* _${deliveryTimeText}_`, { parse_mode: 'Markdown' });
+await bot.sendMessage(chatId, '*Дякуємо за надану інформацію!*', { parse_mode: 'Markdown' });
+await bot.sendMessage(chatId, `*Ваше ПІБ:* _${data?.name}_`, { parse_mode: 'Markdown' });
+await bot.sendMessage(chatId, `*Ваш номер телефону:* _${data?.numberphone}_`, { parse_mode: 'Markdown' });
+await bot.sendMessage(chatId, `*Ваше місто:* _${data?.city}_`, { parse_mode: 'Markdown' });
+await bot.sendMessage(chatId, `*Ваша адреса:* _${data?.street}_`, { parse_mode: 'Markdown' });
+await bot.sendMessage(chatId, `*Метод доставки:* _${deliveryMethodText}_`, { parse_mode: 'Markdown' });
+await bot.sendMessage(chatId, `*Вартість доставки:* _${data?.deliveryPrice}_`, { parse_mode: 'Markdown' });
+// Відправка повідомлення з приблизним часом доставки
+await bot.sendMessage(chatId, `*Приблизний час доставки:* _${deliveryTimeText}_`, { parse_mode: 'Markdown' });
+
 
       setTimeout(async () => {
         await bot.sendMessage(chatId, 'Заходьте в наш інтернет магазин за кнопкою нижче', {
