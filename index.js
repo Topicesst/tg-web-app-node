@@ -36,22 +36,22 @@ bot.on('message', async (msg) => {
   }
 
   if (msg?.web_app_data?.data) {
-    let deliveryMethodText = ''; // Перемістіть змінну на вищий рівень в контексті
-    try {
-      const data = JSON.parse(msg.web_app_data.data);
-      // Перетворення deliveryMethod на зрозумілий текст
-      switch(data.deliveryMethod) {
-        case 'courier':
-          deliveryMethodText = 'Доставка кур\'єром';
-          break;
-        case 'pickup':
-          deliveryMethodText = 'Самовивіз';
-          break;
-        default:
-          deliveryMethodText = 'Метод доставки не вибрано';
-      }
+  try {
+    const data = JSON.parse(msg.web_app_data.data);
 
-      let deliveryTimeText = data.deliveryTime ? `Приблизно ${data.deliveryTime}` : 'Час доставки не вказано';
+    let deliveryMethodText = '';
+    switch(data.deliveryMethod) {
+      case 'courier':
+        deliveryMethodText = 'Доставка кур\'єром';
+        break;
+      case 'pickup':
+        deliveryMethodText = 'Самовивіз';
+        break;
+      default:
+        deliveryMethodText = 'Метод доставки не вибрано';
+    }
+
+      let deliveryTimeText = data.deliveryTime ? `${data.deliveryTime}` : 'Час доставки не вказано';
 
       // Відправка повідомлень
       await bot.sendMessage(chatId, '*Дякуємо за надану інформацію!*', { parse_mode: 'Markdown' });
@@ -61,7 +61,7 @@ bot.on('message', async (msg) => {
       await bot.sendMessage(chatId, `*Ваша адреса:* _${data?.street}_`, { parse_mode: 'Markdown' });
       await bot.sendMessage(chatId, `*Метод доставки:* _${deliveryMethodText}_`, { parse_mode: 'Markdown' });
       await bot.sendMessage(chatId, `*Вартість доставки:* _${data?.deliveryPrice}_`, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*Приблизний час доставки:* _${deliveryTimeText}_`, { parse_mode: 'Markdown' });
+     await bot.sendMessage(chatId, `*Приблизний час доставки:* _${deliveryTimeText}_`, { parse_mode: 'Markdown' });
 
       setTimeout(async () => {
         await bot.sendMessage(chatId, 'Заходьте в наш інтернет магазин за кнопкою нижче', {
