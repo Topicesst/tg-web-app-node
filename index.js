@@ -60,8 +60,15 @@ bot.on('message', async (msg) => {
       await bot.sendMessage(chatId, `*🏙️ Ваше місто:* _${data?.city}_`, { parse_mode: 'Markdown' });
       await bot.sendMessage(chatId, `*📍 Ваша адреса:* _${data?.street}_`, { parse_mode: 'Markdown' });
       await bot.sendMessage(chatId, `*🚕 Метод доставки:* _${deliveryMethodText}_`, { parse_mode: 'Markdown' });
+    
+    if (data.deliveryMethod !== 'pickup') {
+      // Тільки для методу доставки, який не є самовивозом
       await bot.sendMessage(chatId, `*💵 Вартість доставки:* _${data?.deliveryPrice}_`, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*⌚ Приблизний час доставки:* _${deliveryTimeText}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*⌚ Приблизний час доставки:* _${data.deliveryTime ? `Приблизно ${data.deliveryTime}` : 'Час доставки не вказано'}_`, { parse_mode: 'Markdown' });
+    } else {
+      // Додаткова інформація для самовивозу
+      await bot.sendMessage(chatId, `*📍 Адреса для самовивозу:* _вулиця Руська, 209-Б, Чернівці, Чернівецька область, Україна_`, { parse_mode: 'Markdown' });
+    }
 
       setTimeout(async () => {
         await bot.sendMessage(chatId, 'Заходьте в наш інтернет магазин за кнопкою нижче', {
