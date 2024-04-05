@@ -50,7 +50,7 @@ bot.on('message', async (msg) => {
         deliveryMethodText = 'Метод доставки не вибрано';
     }
 
-      let deliveryTimeText = data.deliveryTime ? `${data.deliveryTime}` : 'Час доставки не вказано';
+      let deliveryTimeText = data.deliveryTime ? (data.deliveryTime.startsWith("Приблизно") ? `${data.deliveryTime}` : `Приблизно ${data.deliveryTime}`) : 'Час доставки не вказано';
 
       // Відправка повідомлень
       await bot.sendMessage(chatId, '*Дякуємо за надану інформацію!*', { parse_mode: 'Markdown' });
