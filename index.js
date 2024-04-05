@@ -60,7 +60,7 @@ bot.on('message', async (msg) => {
     
     if (data.deliveryMethod !== 'pickup') {
       // Тільки для методу доставки, який не є самовивозом
-      let deliveryTimeText = data.deliveryTime ? (data.deliveryTime.startsWith("Приблизно") ? `${data.deliveryTime}` : `Приблизно ${data.deliveryTime}`) : 'Час доставки не вказано';
+      let deliveryTimeText = data.deliveryTime ? (data.deliveryTime.startsWith("Приблизно") ? `${data.deliveryTime}` : `${data.deliveryTime}`) : 'Час доставки не вказано';
       
       await bot.sendMessage(chatId, `*💵 Вартість доставки:* _${data?.deliveryPrice}_`, { parse_mode: 'Markdown' });
       await bot.sendMessage(chatId, `*⌚ Приблизний час доставки:* _${data.deliveryTime ? `Приблизно ${data.deliveryTime}` : 'Час доставки не вказано'}_`, { parse_mode: 'Markdown' });
