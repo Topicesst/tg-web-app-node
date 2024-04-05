@@ -84,9 +84,17 @@ bot.on('message', async (msg) => {
   }
 });
 
+// Припустимо, у нас є функція getPreviousOrderTotal, яка повертає загальну суму замовлення для користувача
+// і функція saveNewOrderTotal, яка зберігає загальну суму замовлення після кожного нового замовлення.
+
 app.post('/web-data', async (req, res) => {
-  const { queryId, products = [], totalPrice } = req.body;
+  const { queryId, products = [], totalPrice, userId } = req.body; // Додамо userId для ідентифікації користувача
   try {
+    const previousTotal = await getPreviousOrderTotal(userId); // Отримуємо попередню загальну суму
+    const newTotal = previousTotal + totalPrice; // Сумуємо з новим замовленням
+
+    await saveNewOrderTotal(userId, newTotal); // Зберігаємо оновлену загальну суму
+
     await bot.answerWebAppQuery(queryId, {
       type: 'article',
       id: queryId,
@@ -94,13 +102,14 @@ app.post('/web-data', async (req, res) => {
       input_message_content: {
         message_text: [
           '*Вітаємо з покупкою!*',
-          `*Сума замовлення:* _${totalPrice}₴_`,
+          `*Загальна сума ваших замовлень:* _${newTotal}₴_`, // Тут ви відображаєте загальну суму
           '*Що саме ви замовили:*',
           ...products.map(item => `• _${item.title}_`)
         ].join('\n'),
         parse_mode: 'Markdown' 
       }
     });
+
     res.status(200).json({});
   } catch (e) {
     console.error(e);
@@ -108,7 +117,5 @@ app.post('/web-data', async (req, res) => {
   }
 });
 
-const PORT = 8000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+// Функції getPreviousOrderTotal і saveNewOrderTotal потрібно реалізувати залежно від вашої системи збереження стану
+
