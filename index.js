@@ -1,19 +1,3 @@
-const firebase = require('firebase/app');
-require('firebase/analytics');
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAIN5YHKjJk6eCU00XEjGkrFHrxQyITgd4",
-  authDomain: "tg-web-app-bot-8d79b.firebaseapp.com",
-  projectId: "tg-web-app-bot-8d79b",
-  storageBucket: "tg-web-app-bot-8d79b.appspot.com",
-  messagingSenderId: "494356709244",
-  appId: "1:494356709244:web:d12c89285dac6add6d6ef9",
-  measurementId: "G-M9J3RSM23P"
-};
-
-const fbApp = firebase.initializeApp(firebaseConfig);
-const analytics = firebase.getAnalytics(fbApp);
-
 const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 const cors = require('cors');
