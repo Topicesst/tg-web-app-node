@@ -103,11 +103,18 @@ bot.on('message', async (msg) => {
 });
 
 app.post('/web-data', async (req, res) => {
-  const { queryId, products = [], totalPrice, deliveryPrice = 0 } = req.body; // Припустимо, що deliveryPrice прийшло разом із запитом
+  const { queryId, products = [], totalPrice, deliveryPrice } = req.body;
 
   try {
-    // Перетворюємо totalPrice і deliveryPrice у числа, щоб додати їх
-    const totalOrderPrice = Number(totalPrice) + Number(deliveryPrice);
+    // Перетворення рядків у числа для totalPrice і deliveryPrice
+    const numericTotalPrice = Number(totalPrice);
+    const numericDeliveryPrice = Number(deliveryPrice.replace(' грн', '')); // видаляємо текстову частину " грн"
+
+    if (isNaN(numericTotalPrice) || isNaN(numericDeliveryPrice)) {
+      throw new Error('Total price or delivery price is not a valid number.');
+    }
+
+    const totalOrderPrice = numericTotalPrice + numericDeliveryPrice;
 
     await bot.answerWebAppQuery(queryId, {
       type: 'article',
@@ -116,21 +123,23 @@ app.post('/web-data', async (req, res) => {
       input_message_content: {
         message_text: [
           '*Вітаємо з покупкою!*',
-          `*Сума замовлення:* _${totalPrice}₴_`,
-          `*Вартість доставки:* _${deliveryPrice}₴_`, // Додаємо вартість доставки
-          `*Загальна сума оплати:* _${totalOrderPrice}₴_`, // Додаємо загальну суму оплати
+          `*Сума замовлення:* _${numericTotalPrice.toFixed(2)}₴_`,
+          `*Вартість доставки:* _${numericDeliveryPrice.toFixed(2)}₴_`,
+          `*Загальна сума оплати:* _${totalOrderPrice.toFixed(2)}₴_`,
           '*Що саме ви замовили:*',
           ...products.map(item => `• _${item.title}_`)
         ].join('\n'),
         parse_mode: 'Markdown'
       }
     });
+
     res.status(200).json({});
   } catch (e) {
     console.error(e);
-    res.status(500).json({});
+    res.status(500).json({ message: e.message });
   }
 });
+
 
 const PORT = 8000;
 app.listen(PORT, () => {
