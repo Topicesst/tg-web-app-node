@@ -1,7 +1,6 @@
 const TelegramBot = require("node-telegram-bot-api");
 const express = require("express");
 const cors = require("cors");
-require("dotenv").config();
 
 const { initializeApp } = require('firebase/app');
 const { getFirestore, doc, setDoc, collection, collectionGroup } = require('firebase/firestore');
