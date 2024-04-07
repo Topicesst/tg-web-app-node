@@ -102,7 +102,7 @@ app.post('/web-data', async (req, res) => {
 
   // Перевірка на наявність deliveryPrice та конвертація у числове значення
   if (typeof deliveryPrice === 'string') {
-    deliveryPrice = deliveryPrice.replace(' грн', '');
+    deliveryPrice = parseFloat(deliveryPrice.replace(/[^\d.]/g, ''));
     deliveryPrice = parseFloat(deliveryPrice);
   }
 
