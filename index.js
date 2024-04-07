@@ -1,5 +1,5 @@
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+const firebase = require('firebase/app');
+require('firebase/analytics');
 
 const firebaseConfig = {
   apiKey: "AIzaSyAIN5YHKjJk6eCU00XEjGkrFHrxQyITgd4",
@@ -11,8 +11,8 @@ const firebaseConfig = {
   measurementId: "G-M9J3RSM23P"
 };
 
-const fbApp = initializeApp(firebaseConfig);
-const analytics = getAnalytics(fbApp);
+const fbApp = firebase.initializeApp(firebaseConfig);
+const analytics = firebase.getAnalytics(fbApp);
 
 const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
