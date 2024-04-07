@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 
 const { initializeApp } = require('firebase/app');
-const { getFirestore, doc, setDoc, collection, collectionGroup } = require('firebase/firestore');
+const { getFirestore, doc, setDoc, collection } = require('firebase/firestore');
 
 const firebaseConfig = {
   apiKey: "AIzaSyAIN5YHKjJk6eCU00XEjGkrFHrxQyITgd4",
@@ -34,7 +34,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text;
@@ -51,20 +50,24 @@ bot.on('message', async (msg) => {
   }
 
   if (msg?.web_app_data?.data) {
-  try {
-    const data = JSON.parse(msg.web_app_data.data);
+    try {
+      const data = JSON.parse(msg.web_app_data.data);
+      
+      // Збереження даних в Firestore
+      const docRef = doc(collection(db, "orders"));
+      await setDoc(docRef, data);
 
-    let deliveryMethodText = '';
-    switch(data.deliveryMethod) {
-      case 'courier':
-        deliveryMethodText = 'Доставка кур\'єром';
-        break;
-      case 'pickup':
-        deliveryMethodText = 'Самовивіз';
-        break;
-      default:
-        deliveryMethodText = 'Метод доставки не вибрано';
-    }
+      let deliveryMethodText = '';
+      switch(data.deliveryMethod) {
+        case 'courier':
+          deliveryMethodText = 'Доставка кур\'єром';
+          break;
+        case 'pickup':
+          deliveryMethodText = 'Самовивіз';
+          break;
+        default:
+          deliveryMethodText = 'Метод доставки не вибрано';
+      }
 
       // Відправка повідомлень
       await bot.sendMessage(chatId, '*Дякуємо за надану інформацію!*', { parse_mode: 'Markdown' });
@@ -73,36 +76,43 @@ bot.on('message', async (msg) => {
       await bot.sendMessage(chatId, `*🏙️ Ваше місто:* _${data?.city}_`, { parse_mode: 'Markdown' });
       await bot.sendMessage(chatId, `*📍 Ваша адреса:* _${data?.street}_`, { parse_mode: 'Markdown' });
       await bot.sendMessage(chatId, `*🚕 Метод доставки:* _${deliveryMethodText}_`, { parse_mode: 'Markdown' });
-    
-    if (data.deliveryMethod !== 'pickup') {
-      // Тільки для методу доставки, який не є самовивозом
-      let deliveryTimeText = data.deliveryTime ? (data.deliveryTime.startsWith ? `${data.deliveryTime}` : `${data.deliveryTime}`) : 'Час доставки не вказано';
-      
-      await bot.sendMessage(chatId, `*💵 Вартість доставки:* _${data?.deliveryPrice}_`, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*⌚ Приблизний час доставки:* _${data.deliveryTime ? `${data.deliveryTime}` : 'Час доставки не вказано'}_`, { parse_mode: 'Markdown' });
-    } else {
-      // Додаткова інформація для самовивозу
-      await bot.sendMessage(chatId, `*📍 Адреса для самовивозу:* _вулиця Руська, 209-Б, Чернівці, Чернівецька область, Україна_`, { parse_mode: 'Markdown' });
-    }
 
-    setTimeout(async () => {
-      await bot.sendMessage(chatId, 'Заходьте в наш інтернет магазин за кнопкою нижче', {
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: 'Зробити замовлення', web_app: { url: webAppUrl } }],
-          ]
-        }
-      });
-    }, 3000); 
-  } catch (e) {
-    console.error(e);
+      if (data.deliveryMethod !== 'pickup') {
+        // Тільки для методу доставки, який не є самовивозом
+        await bot.sendMessage(chatId, `*💵 Вартість доставки:* _${data?.deliveryPrice}_`, { parse_mode: 'Markdown' });
+        await bot.sendMessage(chatId, `*⌚ Приблизний час доставки:* _${data.deliveryTime ? `${data.deliveryTime}` : 'Час доставки не вказано'}_`, { parse_mode: 'Markdown' });
+      } else {
+        // Додаткова інформація для самовивозу
+        await bot.sendMessage(chatId, `*📍 Адреса для самовивозу:* _вулиця Руська, 209-Б, Чернівці, Чернівецька область, Україна_`, { parse_mode: 'Markdown' });
+      }
+
+      setTimeout(async () => {
+        await bot.sendMessage(chatId, 'Заходьте в наш інтернет магазин за кнопкою нижче', {
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: 'Зробити замовлення', web_app: { url: webAppUrl } }],
+            ]
+          }
+        });
+      }, 3000); 
+
+    } catch (e) {
+      console.error(e);
+    }
   }
-}
 });
 
 app.post('/web-data', async (req, res) => {
   const { queryId, products = [], totalPrice } = req.body;
   try {
+    // Збереження даних веб-додатка в Firestore
+    const webDataRef = doc(collection(db, "webData"));
+    await setDoc(webDataRef, {
+      queryId,
+      products,
+      totalPrice
+    });
+
     await bot.answerWebAppQuery(queryId, {
       type: 'article',
       id: queryId,
@@ -126,5 +136,5 @@ app.post('/web-data', async (req, res) => {
 
 const PORT = 8000;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Сервер запущено на порту ${PORT}`);
 });
