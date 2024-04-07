@@ -103,46 +103,34 @@ bot.on('message', async (msg) => {
 });
 
 app.post('/web-data', async (req, res) => {
-  const { queryId, products = [], totalPrice } = req.body;
-  try {
-    // Збереження даних веб-додатка в Firestore
-    const webDataRef = doc(collection(db, "webData"));
-    await setDoc(webDataRef, {
-      queryId,
-      products,
-      totalPrice
-    });
+  const { queryId, products = [], totalPrice, deliveryPrice = 0 } = req.body; // Припустимо, що deliveryPrice прийшло разом із запитом
 
-    app.post('/web-data', async (req, res) => {
-      const { queryId, products = [], totalPrice, deliveryPrice = 0 } = req.body; // Припустимо, що deliveryPrice прийшло разом із запитом
-    
-      try {
-        // Перетворюємо totalPrice і deliveryPrice у числа, щоб додати їх
-        const totalOrderPrice = Number(totalPrice) + Number(deliveryPrice);
-    
-        await bot.answerWebAppQuery(queryId, {
-          type: 'article',
-          id: queryId,
-          title: 'Успішна покупка',
-          input_message_content: {
-            message_text: [
-              '*Вітаємо з покупкою!*',
-              `*Сума замовлення:* _${totalPrice}₴_`,
-              `*Вартість доставки:* _${deliveryPrice}₴_`, // Додаємо вартість доставки
-              `*Загальна сума оплати:* _${totalOrderPrice}₴_`, // Додаємо загальну суму оплати
-              '*Що саме ви замовили:*',
-              ...products.map(item => `• _${item.title}_`)
-            ].join('\n'),
-            parse_mode: 'Markdown' 
-          }
-        });
-        res.status(200).json({});
-      } catch (e) {
-        console.error(e);
-        res.status(500).json({});
+  try {
+    // Перетворюємо totalPrice і deliveryPrice у числа, щоб додати їх
+    const totalOrderPrice = Number(totalPrice) + Number(deliveryPrice);
+
+    await bot.answerWebAppQuery(queryId, {
+      type: 'article',
+      id: queryId,
+      title: 'Успішна покупка',
+      input_message_content: {
+        message_text: [
+          '*Вітаємо з покупкою!*',
+          `*Сума замовлення:* _${totalPrice}₴_`,
+          `*Вартість доставки:* _${deliveryPrice}₴_`, // Додаємо вартість доставки
+          `*Загальна сума оплати:* _${totalOrderPrice}₴_`, // Додаємо загальну суму оплати
+          '*Що саме ви замовили:*',
+          ...products.map(item => `• _${item.title}_`)
+        ].join('\n'),
+        parse_mode: 'Markdown'
       }
     });
-    
+    res.status(200).json({});
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({});
+  }
+});
 
 const PORT = 8000;
 app.listen(PORT, () => {
