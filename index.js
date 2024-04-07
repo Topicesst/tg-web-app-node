@@ -18,7 +18,7 @@ const firebaseConfig = {
 const fbapp = initializeApp(firebaseConfig);
 const db = getFirestore(fbapp);
 
-const token = process.env.BOT_TOKEN; 
+const token = "6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0"; 
 const webAppUrl = "https://react-food-app-1195b991855b.herokuapp.com/";
 
 const bot = new TelegramBot(token, { polling: true });
