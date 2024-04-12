@@ -94,9 +94,9 @@ bot.on('message', async (msg) => {
 
 app.post('/web-data', async (req, res) => {
   const { queryId, products, totalPrice } = req.body;
-  let deliveryPrice = parseFloat(req.body.deliveryPrice.replace(/[^\d.]/g, ''));
-  if (isNaN(deliveryPrice)) {
-    deliveryPrice = 0;
+   let deliveryPrice = 0;
+  if (req.body.deliveryPrice) {
+    deliveryPrice = parseFloat(req.body.deliveryPrice.replace(/[^\d.]/g, ''));
   }
 
   const numericTotalPrice = parseFloat(totalPrice);
