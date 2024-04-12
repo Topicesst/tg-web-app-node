@@ -7,7 +7,7 @@ const { getFirestore, doc, setDoc, collection } = require('firebase/firestore');
 
 let price = 0;
 
-const token = "YOUR_BOT_TOKEN"; // Ваш токен для бота Telegram
+const token = "6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0"; // Ваш токен для бота Telegram
 const webAppUrl = "https://deft-caramel-01f656.netlify.app/";
 
 const bot = new TelegramBot(token, { polling: true });
