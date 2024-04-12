@@ -124,14 +124,23 @@ bot.on('message', async (msg) => {
   }
 });
 
-app.post('/confirm-purchase', async (req, res) => {
-  const { products, price, queryId } = req.body; // Припускаю, що 'price' це вартість доставки
+app.post('/web-data', async (req, res) => {
+  const { queryId, products, totalPrice } = req.body;
+  let deliveryPrice = req.body.deliveryPrice; // Припустимо, що deliveryPrice приходить як рядок "XX.XX грн"
 
-  // Розрахунок загальної вартості товарів
-  const numericTotalPrice = products.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  
-  // Додаємо numericTotalPrice до вартості доставки, щоб отримати загальну вартість замовлення
-  const totalOrderPrice = numericTotalPrice + price;
+  // Перевірка на наявність deliveryPrice та конвертація у числове значення
+  if (typeof deliveryPrice === 'string') {
+    deliveryPrice = parseFloat(deliveryPrice.replace(/[^\d.]/g, ''));
+    deliveryPrice = parseFloat(deliveryPrice);
+  }
+
+  if (isNaN(deliveryPrice)) {
+    // Якщо deliveryPrice не є числом, встановлюємо його як 0
+    deliveryPrice = 0;
+  }
+
+  const numericTotalPrice = parseFloat(totalPrice);
+  const totalOrderPrice = numericTotalPrice + deliveryPrice;
 
   try {
     await bot.answerWebAppQuery(queryId, {
@@ -142,10 +151,10 @@ app.post('/confirm-purchase', async (req, res) => {
         message_text: [
           '*Вітаємо з покупкою!*',
           `*Сума замовлення:* _${numericTotalPrice.toFixed(2)}₴_`,
-          `*Вартість доставки:* _${price.toFixed(2)}₴_`,
+          `*Вартість доставки:* _${price}₴_`,
           `*Загальна сума оплати:* _${totalOrderPrice.toFixed(2)}₴_`,
           '*Що саме ви замовили:*',
-          ...products.map(item => `• _${item.title}_ (${item.quantity} x ${item.price.toFixed(2)}₴)`)
+          ...products.map(item => `• _${item.title}_`)
         ].join('\n'),
         parse_mode: 'Markdown'
       }
