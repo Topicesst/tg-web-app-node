@@ -5,17 +5,19 @@ const cors = require("cors");
 const { initializeApp } = require('firebase/app');
 const { getFirestore, doc, setDoc, collection } = require('firebase/firestore');
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAIN5YHKjJk6eCU00XEjGkrFHrxQyITgd4",
-  authDomain: "tg-web-app-bot-8d79b.firebaseapp.com",
-  projectId: "tg-web-app-bot-8d79b",
-  storageBucket: "tg-web-app-bot-8d79b.appspot.com",
-  messagingSenderId: "494356709244",
-  appId: "1:494356709244:web:d12c89285dac6add6d6ef9",
-  measurementId: "G-M9J3RSM23P"
-};
-const fbapp = initializeApp(firebaseConfig);
-const db = getFirestore(fbapp);
+let price = 0;
+
+// const firebaseConfig = {
+  // apiKey: "AIzaSyAIN5YHKjJk6eCU00XEjGkrFHrxQyITgd4",
+  // authDomain: "tg-web-app-bot-8d79b.firebaseapp.com",
+  // projectId: "tg-web-app-bot-8d79b",
+  // storageBucket: "tg-web-app-bot-8d79b.appspot.com",
+  // messagingSenderId: "494356709244",
+  // appId: "1:494356709244:web:d12c89285dac6add6d6ef9",
+  // measurementId: "G-M9J3RSM23P"
+// };
+// const fbapp = initializeApp(firebaseConfig);
+// const db = getFirestore(fbapp);
 
 const token = "6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0"; 
 const webAppUrl = "https://deft-caramel-01f656.netlify.app/";
@@ -24,6 +26,14 @@ const bot = new TelegramBot(token, { polling: true });
 const app = express();
 
 app.use(express.json());
+
+const corsOptions = {
+  origin: "https://deft-caramel-01f656.netlify.app",
+  methods: ["GET", "PUT", "POST", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
+
 app.use(cors({
   origin: 'https://deft-caramel-01f656.netlify.app',
   methods: ['GET', 'PUT', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -50,9 +60,8 @@ bot.on('message', async (msg) => {
   if (msg?.web_app_data?.data) {
     try {
       const data = JSON.parse(msg.web_app_data.data);
-      // Зберігаємо дані в Firestore
-      const docRef = doc(collection(db, "orders"));
-      await setDoc(docRef, data);
+
+      price = data.deliveryPrice;  
 
       let deliveryMethodText = '';
       switch(data.deliveryMethod) {
@@ -74,9 +83,28 @@ bot.on('message', async (msg) => {
       await bot.sendMessage(chatId, `*📍 Ваша адреса:* _${data?.street}_`, { parse_mode: 'Markdown' });
       await bot.sendMessage(chatId, `*🚕 Метод доставки:* _${deliveryMethodText}_`, { parse_mode: 'Markdown' });
 
-      if (data.deliveryMethod !== 'pickup') {
-        await bot.sendMessage(chatId, `*💵 Вартість доставки:* _${data?.deliveryPrice}_`, { parse_mode: 'Markdown' });
-        await bot.sendMessage(chatId, `*⌚ Приблизний час доставки:* _${data.deliveryTime ? `${data.deliveryTime}` : 'Час доставки не вказано'}_`, { parse_mode: 'Markdown' });
+     if (data.deliveryMethod !== "pickup") {
+        // Тільки для методу доставки, який не є самовивозом
+        let deliveryTimeText = data.deliveryTime
+          ? data.deliveryTime.startsWith
+            ? `${data.deliveryTime}`
+            : `${data.deliveryTime}`
+          : "Час доставки не вказано";
+
+        await bot.sendMessage(
+          chatId,
+          `*💵 Вартість доставки:* _${price}_`, // Используем ее
+          { parse_mode: "Markdown" }
+        );
+        await bot.sendMessage(
+          chatId,
+          `*⌚ Приблизний час доставки:* _${
+            data.deliveryTime
+              ? `${data.deliveryTime}`
+              : "Час доставки не вказано"
+          }_`,
+          { parse_mode: "Markdown" }
+        );
       }
 
       // Чекаємо 3 секунди перед надсиланням наступного повідомлення
@@ -123,7 +151,7 @@ app.post('/web-data', async (req, res) => {
         message_text: [
           '*Вітаємо з покупкою!*',
           `*Сума замовлення:* _${numericTotalPrice.toFixed(2)}₴_`,
-          `*Вартість доставки:* _${deliveryPrice.toFixed(2)}₴_`,
+          `*Вартість доставки:* _${price}₴_`,
           `*Загальна сума оплати:* _${totalOrderPrice.toFixed(2)}₴_`,
           '*Що саме ви замовили:*',
           ...products.map(item => `• _${item.title}_`)
