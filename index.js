@@ -158,13 +158,6 @@ app.post('/confirm-purchase', async (req, res) => {
   }
 });
 
-    res.status(200).json({});
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: e.message });
-  }
-});
-
 const PORT = 8000;
 app.listen(PORT, () => {
   console.log(`Сервер запущено на порту ${PORT}`);
