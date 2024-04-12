@@ -7,19 +7,7 @@ const { getFirestore, doc, setDoc, collection } = require('firebase/firestore');
 
 let price = 0;
 
-// const firebaseConfig = {
-  // apiKey: "AIzaSyAIN5YHKjJk6eCU00XEjGkrFHrxQyITgd4",
-  // authDomain: "tg-web-app-bot-8d79b.firebaseapp.com",
-  // projectId: "tg-web-app-bot-8d79b",
-  // storageBucket: "tg-web-app-bot-8d79b.appspot.com",
-  // messagingSenderId: "494356709244",
-  // appId: "1:494356709244:web:d12c89285dac6add6d6ef9",
-  // measurementId: "G-M9J3RSM23P"
-// };
-// const fbapp = initializeApp(firebaseConfig);
-// const db = getFirestore(fbapp);
-
-const token = "6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0"; 
+const token = "YOUR_BOT_TOKEN"; // Ваш токен для бота Telegram
 const webAppUrl = "https://deft-caramel-01f656.netlify.app/";
 
 const bot = new TelegramBot(token, { polling: true });
@@ -34,12 +22,7 @@ const corsOptions = {
   credentials: true,
 };
 
-app.use(cors({
-  origin: 'https://deft-caramel-01f656.netlify.app',
-  methods: ['GET', 'PUT', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-}));
+app.use(cors(corsOptions));
 
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
@@ -56,12 +39,10 @@ bot.on('message', async (msg) => {
     });
   }
 
-  // Опрацювання даних веб-додатка
   if (msg?.web_app_data?.data) {
     try {
       const data = JSON.parse(msg.web_app_data.data);
-
-      price = data.deliveryPrice;  
+      price = parseFloat(data.deliveryPrice.replace(/[^\d.]/g, ''));
 
       let deliveryMethodText = '';
       switch(data.deliveryMethod) {
@@ -75,7 +56,6 @@ bot.on('message', async (msg) => {
           deliveryMethodText = 'Метод доставки не вибрано';
       }
 
-      // Відправляємо відповідь користувачу
       await bot.sendMessage(chatId, '*Дякуємо за надану інформацію!*', { parse_mode: 'Markdown' });
       await bot.sendMessage(chatId, `*👤️ Ваше ПІБ:* _${data?.name}_`, { parse_mode: 'Markdown' });
       await bot.sendMessage(chatId, `*📱️ Ваш номер телефону:* _${data?.numberphone}_`, { parse_mode: 'Markdown' });
@@ -83,31 +63,19 @@ bot.on('message', async (msg) => {
       await bot.sendMessage(chatId, `*📍 Ваша адреса:* _${data?.street}_`, { parse_mode: 'Markdown' });
       await bot.sendMessage(chatId, `*🚕 Метод доставки:* _${deliveryMethodText}_`, { parse_mode: 'Markdown' });
 
-     if (data.deliveryMethod !== "pickup") {
-        // Тільки для методу доставки, який не є самовивозом
-        let deliveryTimeText = data.deliveryTime
-          ? data.deliveryTime.startsWith
-            ? `${data.deliveryTime}`
-            : `${data.deliveryTime}`
-          : "Час доставки не вказано";
-
+      if (data.deliveryMethod !== "pickup") {
         await bot.sendMessage(
           chatId,
-          `*💵 Вартість доставки:* _${price}_`, // Используем ее
+          `*💵 Вартість доставки:* _${price}_`,
           { parse_mode: "Markdown" }
         );
         await bot.sendMessage(
           chatId,
-          `*⌚ Приблизний час доставки:* _${
-            data.deliveryTime
-              ? `${data.deliveryTime}`
-              : "Час доставки не вказано"
-          }_`,
+          `*⌚ Приблизний час доставки:* _${data.deliveryTime || "Час доставки не вказано"}_`,
           { parse_mode: "Markdown" }
         );
       }
 
-      // Чекаємо 3 секунди перед надсиланням наступного повідомлення
       setTimeout(async () => {
         await bot.sendMessage(chatId, 'Заходьте в наш інтернет магазин за кнопкою нижче', {
           reply_markup: {
@@ -126,16 +94,8 @@ bot.on('message', async (msg) => {
 
 app.post('/web-data', async (req, res) => {
   const { queryId, products, totalPrice } = req.body;
-  let deliveryPrice = req.body.deliveryPrice; // Припустимо, що deliveryPrice приходить як рядок "XX.XX грн"
-
-  // Перевірка на наявність deliveryPrice та конвертація у числове значення
-  if (typeof deliveryPrice === 'string') {
-    deliveryPrice = parseFloat(deliveryPrice.replace(/[^\d.]/g, ''));
-    deliveryPrice = parseFloat(deliveryPrice);
-  }
-
+  let deliveryPrice = parseFloat(req.body.deliveryPrice.replace(/[^\d.]/g, ''));
   if (isNaN(deliveryPrice)) {
-    // Якщо deliveryPrice не є числом, встановлюємо його як 0
     deliveryPrice = 0;
   }
 
@@ -151,7 +111,7 @@ app.post('/web-data', async (req, res) => {
         message_text: [
           '*Вітаємо з покупкою!*',
           `*Сума замовлення:* _${numericTotalPrice.toFixed(2)}₴_`,
-          `*Вартість доставки:* _${price}₴_`,
+          `*Вартість доставки:* _${deliveryPrice.toFixed(2)}₴_`,
           `*Загальна сума оплати:* _${totalOrderPrice.toFixed(2)}₴_`,
           '*Що саме ви замовили:*',
           ...products.map(item => `• _${item.title}_`)
@@ -159,7 +119,6 @@ app.post('/web-data', async (req, res) => {
         parse_mode: 'Markdown'
       }
     });
-
     res.status(200).json({});
   } catch (e) {
     console.error(e);
