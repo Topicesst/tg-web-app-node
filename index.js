@@ -152,7 +152,7 @@ app.post('/web-data', async (req, res) => {
           '*Вітаємо з покупкою!*',
           `*Сума замовлення:* _${numericTotalPrice.toFixed(2)}₴_`,
           `*Вартість доставки:* _${price}₴_`,
-          `*Загальна сума оплати:* _${totalOrderPrice.toFixed(2)}₴_`,
+         '*Загальна сума оплати:* _${parseInt(totalPrice) + parseInt(price)}₴_',
           '*Що саме ви замовили:*',
           ...products.map(item => `• _${item.title}_`)
         ].join('\n'),
