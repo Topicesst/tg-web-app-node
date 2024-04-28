@@ -18,7 +18,7 @@ const firebaseConfig = {
 };
 
 const fbapp = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+const analytics = getAnalytics(fbapp);
 
 const token = "6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0"; 
 const webAppUrl = "https://deft-caramel-01f656.netlify.app/";
