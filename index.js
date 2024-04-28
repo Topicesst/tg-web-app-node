@@ -2,23 +2,10 @@ const TelegramBot = require("node-telegram-bot-api");
 const express = require("express");
 const cors = require("cors");
 
-let price = 0;
-
 const { initializeApp } = require('firebase/app');
-const { getFirestore, doc, setDoc, collection, collectionGroup } = require('firebase/firestore');
+const { getFirestore, doc, setDoc, collection } = require('firebase/firestore');
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAIN5YHKjJk6eCU00XEjGkrFHrxQyITgd4",
-  authDomain: "tg-web-app-bot-8d79b.firebaseapp.com",
-  projectId: "tg-web-app-bot-8d79b",
-  storageBucket: "tg-web-app-bot-8d79b.appspot.com",
-  messagingSenderId: "494356709244",
-  appId: "1:494356709244:web:d12c89285dac6add6d6ef9",
-  measurementId: "G-M9J3RSM23P"
-};
-
-const fbapp = initializeApp(firebaseConfig);
-const db = getFirestore(fbapp);
+let price = 0;
 
 const token = "6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0"; 
 const webAppUrl = "https://deft-caramel-01f656.netlify.app/";
@@ -27,7 +14,6 @@ const bot = new TelegramBot(token, { polling: true });
 const app = express();
 
 app.use(express.json());
-
 
 const corsOptions = {
   origin: "https://deft-caramel-01f656.netlify.app",
@@ -48,8 +34,6 @@ bot.on('message', async (msg) => {
   const text = msg.text;
 
   if (text === '/start') {
-    try {
-     let user = "";
     await bot.sendMessage(chatId, 'Нижче з\'явиться кнопка, заповніть форму', {
       reply_markup: {
         keyboard: [
@@ -63,21 +47,7 @@ bot.on('message', async (msg) => {
   if (msg?.web_app_data?.data) {
     try {
       const data = JSON.parse(msg.web_app_data.data);
-      const ordersRef = collection(db, "orders");
-      const newOrderRef = doc(ordersRef);
 
-      const orderData = {
-        city: data.city,
-        deliveryMethod: data.deliveryMethod,
-        deliveryPrice: data.deliveryPrice,
-        deliveryTime: data.deliveryTime,
-        name: data.name,
-        numberphone: data.numberphone,
-        street: data.street
-      };
-
-      await setDoc(newOrderRef, orderData);
-      
       price = data.deliveryPrice;  
 
       let deliveryMethodText = '';
