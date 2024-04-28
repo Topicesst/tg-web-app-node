@@ -8,13 +8,15 @@ const { initializeApp } = require('firebase/app');
 const { getFirestore, doc, setDoc, collection, collectionGroup } = require('firebase/firestore');
 
 const firebaseConfig = {
-  apiKey: "ou9ObOaVQyIgJi4k0gpL1BK",
-  authDomain: "for-gor.firebaseapp.com",
-  projectId: "for-gt",
-  storageBucket: "for-gorot.appspot.com",
-  messagingSenderId: "42862",
-  appId: "1:423907815:web:394903f"
+  apiKey: "AIzaSyAIN5YHKjJk6eCU00XEjGkrFHrxQyITgd4",
+  authDomain: "tg-web-app-bot-8d79b.firebaseapp.com",
+  projectId: "tg-web-app-bot-8d79b",
+  storageBucket: "tg-web-app-bot-8d79b.appspot.com",
+  messagingSenderId: "494356709244",
+  appId: "1:494356709244:web:d12c89285dac6add6d6ef9",
+  measurementId: "G-M9J3RSM23P"
 };
+
 const fbapp = initializeApp(firebaseConfig);
 const db = getFirestore(fbapp);
 
