@@ -11,7 +11,7 @@ const token = "6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0";
 const webAppUrl = "https://deft-caramel-01f656.netlify.app/";
 
 const bot = new TelegramBot(token, { polling: true });
-const expressApp = express();
+const app = express();
 
 app.use(express.json());
 
