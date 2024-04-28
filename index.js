@@ -7,14 +7,6 @@ const { getFirestore, doc, setDoc, collection } = require('firebase/firestore');
 
 let price = 0;
 
-const token = "6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0"; 
-const webAppUrl = "https://deft-caramel-01f656.netlify.app/";
-
-const bot = new TelegramBot(token, { polling: true });
-const app = express();
-
-app.use(express.json());
-
 const firebaseConfig = {
   apiKey: "AIzaSyAIN5YHKjJk6eCU00XEjGkrFHrxQyITgd4",
   authDomain: "tg-web-app-bot-8d79b.firebaseapp.com",
@@ -25,8 +17,17 @@ const firebaseConfig = {
   measurementId: "G-M9J3RSM23P"
 };
 
-const firebaseApp = initializeApp(firebaseConfig);
+const fbapp = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+
+const token = "6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0"; 
+const webAppUrl = "https://deft-caramel-01f656.netlify.app/";
+
+const bot = new TelegramBot(token, { polling: true });
+const app = express();
+
+app.use(express.json());
+
 
 const corsOptions = {
   origin: "https://deft-caramel-01f656.netlify.app",
