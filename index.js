@@ -4,6 +4,7 @@ const cors = require("cors");
 
 const { initializeApp } = require('firebase/app');
 const { getFirestore, doc, setDoc, collection } = require('firebase/firestore');
+const { getAnalytics } = require('firebase/analytics');
 
 let price = 0;
 
