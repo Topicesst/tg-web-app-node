@@ -2,24 +2,21 @@ const TelegramBot = require("node-telegram-bot-api");
 const express = require("express");
 const cors = require("cors");
 
-const { initializeApp } = require('firebase/app');
-const { getFirestore, doc, setDoc, collection } = require('firebase/firestore');
-const { getAnalytics } = require('firebase/analytics');
-
 let price = 0;
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAIN5YHKjJk6eCU00XEjGkrFHrxQyITgd4",
-  authDomain: "tg-web-app-bot-8d79b.firebaseapp.com",
-  projectId: "tg-web-app-bot-8d79b",
-  storageBucket: "tg-web-app-bot-8d79b.appspot.com",
-  messagingSenderId: "494356709244",
-  appId: "1:494356709244:web:d12c89285dac6add6d6ef9",
-  measurementId: "G-M9J3RSM23P"
-};
+const { initializeApp } = require('firebase/app');
+const { getFirestore, doc, setDoc, collection, collectionGroup } = require('firebase/firestore');
 
+const firebaseConfig = {
+  apiKey: "ou9ObOaVQyIgJi4k0gpL1BK",
+  authDomain: "for-gor.firebaseapp.com",
+  projectId: "for-gt",
+  storageBucket: "for-gorot.appspot.com",
+  messagingSenderId: "42862",
+  appId: "1:423907815:web:394903f"
+};
 const fbapp = initializeApp(firebaseConfig);
-const analytics = getAnalytics(fbapp);
+const db = getFirestore(fbapp);
 
 const token = "6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0"; 
 const webAppUrl = "https://deft-caramel-01f656.netlify.app/";
@@ -49,7 +46,7 @@ bot.on('message', async (msg) => {
   const text = msg.text;
 
   if (text === '/start') {
-    console.log('Start + ' + JSON.stringify(msg));
+    // console.log('Start + ' + JSON.stringify(msg));
 
     try {
      let user = "";
