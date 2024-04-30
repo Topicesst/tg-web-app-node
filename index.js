@@ -1,9 +1,9 @@
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-
 const TelegramBot = require("node-telegram-bot-api");
 const express = require("express");
 const cors = require("cors");
+
+const { initializeApp } = require('firebase/app');
+const { getFirestore, doc, setDoc, collection, collectionGroup } = require('firebase/firestore');
 
 const firebaseConfig = {
   apiKey: "AIzaSyAIN5YHKjJk6eCU00XEjGkrFHrxQyITgd4",
@@ -16,7 +16,7 @@ const firebaseConfig = {
 };
 
 const fbapp = initializeApp(firebaseConfig);
-const analytics = getAnalytics(fbapp);
+const db = getAnalytics(fbapp);
 
 const { initializeApp } = require('firebase/app');
 const { getFirestore, doc, setDoc, collection } = require('firebase/firestore');
@@ -50,6 +50,32 @@ bot.on('message', async (msg) => {
   const text = msg.text;
 
   if (text === '/start') {
+    
+    try {
+      let user = "";
+
+      const firstName = msg.from.first_name || " ";
+      const lastName = msg.from.last_name || " ";
+      const userId = msg.from.id;
+      // console.log(firstName + " " + lastName + " " + userId);
+      const tmpId = Math.random().toString(36).substring(4);
+      const date = new Date();
+      const textDate = date.getHours() + ':' + date.getMinutes() + '  ' + date.getDate() + '.' + date.getMonth() + '.' + date.getFullYear();
+      user = {        
+        firstName: firstName,
+        lastName: lastName,
+        id: userId,        
+        isChecked: true,
+        date: textDate
+      };
+
+      const usersRef = collection(db, "users");
+      await setDoc(doc(usersRef, tmpId), user);
+      
+    } catch (error) {
+      console.log(error);
+    }
+    
     await bot.sendMessage(chatId, 'Нижче з\'явиться кнопка, заповніть форму', {
       reply_markup: {
         keyboard: [
