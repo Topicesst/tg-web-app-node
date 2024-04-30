@@ -16,7 +16,7 @@ const firebaseConfig = {
 };
 
 const fbapp = initializeApp(firebaseConfig);
-const db = getAnalytics(fbapp);
+const db = getFirestore(fbapp);
 
 let price = 0;
 
