@@ -54,7 +54,6 @@ bot.on('message', async (msg) => {
       const firstName = msg.from.first_name || " ";
       const lastName = msg.from.last_name || " ";
       const userId = msg.from.id;
-      // console.log(firstName + " " + lastName + " " + userId);
       const tmpId = Math.random().toString(36).substring(4);
       const date = new Date();
       const textDate = date.getHours() + ':' + date.getMinutes() + '  ' + date.getDate() + '.' + date.getMonth() + '.' + date.getFullYear();
