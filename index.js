@@ -47,31 +47,6 @@ bot.on('message', async (msg) => {
   const text = msg.text;
 
   if (text === '/start') {
-    
-    try {
-      let user = "";
-
-      const firstName = msg.from.first_name || " ";
-      const lastName = msg.from.last_name || " ";
-      const userId = msg.from.id;
-      const tmpId = Math.random().toString(36).substring(4);
-      const date = new Date();
-      const textDate = date.getHours() + ':' + date.getMinutes() + '  ' + date.getDate() + '.' + date.getMonth() + '.' + date.getFullYear();
-      user = {        
-        firstName: firstName,
-        lastName: lastName,
-        id: userId,        
-        isChecked: true,
-        date: textDate
-      };
-
-      const usersRef = collection(db, "users");
-      await setDoc(doc(usersRef, tmpId), user);
-      
-    } catch (error) {
-      console.log(error);
-    }
-    
     await bot.sendMessage(chatId, 'Нижче з\'явиться кнопка, заповніть форму', {
       reply_markup: {
         keyboard: [
