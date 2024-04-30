@@ -18,9 +18,6 @@ const firebaseConfig = {
 const fbapp = initializeApp(firebaseConfig);
 const db = getAnalytics(fbapp);
 
-const { initializeApp } = require('firebase/app');
-const { getFirestore, doc, setDoc, collection } = require('firebase/firestore');
-
 let price = 0;
 
 const token = "6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0"; 
