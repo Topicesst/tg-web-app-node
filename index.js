@@ -47,7 +47,6 @@ bot.on("message", async (msg) => {
   const text = msg.text;
 
   if (text === "/start") {
-    console.log('Start + ' + JSON.stringify(msg));
 
     try {
       let user = "";
