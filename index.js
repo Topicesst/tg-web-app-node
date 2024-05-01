@@ -73,15 +73,6 @@ bot.on('message', async (msg) => {
     console.log(error);
   }
 }
-
-wrireToBase();
-
-      const usersRef = collection(db, "users");
-      await setDoc(doc(usersRef, tmpId), user);
-      
-    } catch (error) {
-      console.log(error);
-    }
     
     await bot.sendMessage(chatId, 'Нижче з\'явиться кнопка, заповніть форму', {
       reply_markup: {
