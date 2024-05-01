@@ -64,7 +64,6 @@ bot.on('message', async (msg) => {
         id: userId,        
         isChecked: true,
         date: textDate,
-        isChecked: true
       };
 
       const usersRef = collection(db, "users");
