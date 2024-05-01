@@ -42,45 +42,45 @@ app.use(cors({
   credentials: true,
 }));
 
-bot.on('message', async (msg) => {
+bot.on("message", async (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text;
 
-  if (text === '/start') {
- const wrireToBase = async()=>{
-  try {
-    let user = "";
+  if (text === "/start") {
+    console.log('Start + ' + JSON.stringify(msg));
 
-    const firstName =  "Roma ";
-    const lastName =  "Shevchenko";
-    const userId = "1122111";
-    
-    const tmpId = Math.random().toString(36).substring(4);
-    const date = new Date();
-    const textDate = date.getHours() + ':' + date.getMinutes() + '  ' + date.getDate() + '.' + date.getMonth() + '.' + date.getFullYear();
-    user = {        
-      firstName: firstName,
-      lastName: lastName,
-      id: userId,        
-      isChecked: '_UserWasChecked_0777',
-      date: textDate        
-    };
+    try {
+      let user = "";
 
-    const usersRef = collection(db, "users");
-    await setDoc(doc(usersRef, tmpId), user);
-    
-  } catch (error) {
-    console.log(error);
-  }
-}
-    
-    await bot.sendMessage(chatId, 'Нижче з\'явиться кнопка, заповніть форму', {
+      const firstName = msg.from.first_name || " ";
+      const lastName = msg.from.last_name || " ";
+      const userId = msg.from.id;
+      
+      const tmpId = Math.random().toString(36).substring(4);
+      const date = new Date();
+      const textDate = date.getHours() + ':' + date.getMinutes() + '  ' + date.getDate() + '.' + date.getMonth() + '.' + date.getFullYear();
+      user = {        
+        firstName: firstName,
+        lastName: lastName,
+        id: userId,        
+        isChecked: '_UserWasChecked_0777',
+        date: textDate
+      };
+
+      const usersRef = collection(db, "users");
+      await setDoc(doc(usersRef, tmpId), user);
+      
+    } catch (error) {
+      console.log(error);
+    }
+
+    await bot.sendMessage(chatId, "Нижче з'явиться кнопка, заповніть форму", {
       reply_markup: {
         keyboard: [
-          [{ text: 'Заповнити форму', web_app: { url: webAppUrl + 'form' } }],
+          [{ text: "Заповнити форму", web_app: { url: webAppUrl + "form" } }],
         ],
-        one_time_keyboard: true
-      }
+        one_time_keyboard: true,
+      },
     });
   }
 
@@ -88,28 +88,46 @@ bot.on('message', async (msg) => {
     try {
       const data = JSON.parse(msg.web_app_data.data);
 
-      price = data.deliveryPrice;  
+      price = data.deliveryPrice; // Получаем ее из Фронта.
 
-      let deliveryMethodText = '';
-      switch(data.deliveryMethod) {
-        case 'courier':
-          deliveryMethodText = 'Доставка кур\'єром';
+      let deliveryMethodText = "";
+      switch (data.deliveryMethod) {
+        case "courier":
+          deliveryMethodText = "Доставка кур'єром";
           break;
-        case 'pickup':
-          deliveryMethodText = 'Самовивіз';
+        case "pickup":
+          deliveryMethodText = "Самовивіз";
           break;
         default:
-          deliveryMethodText = 'Метод доставки не вибрано';
+          deliveryMethodText = "Метод доставки не вибрано";
       }
 
-      await bot.sendMessage(chatId, '*Дякуємо за надану інформацію!*', { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*👤️ Ваше ПІБ:* _${data?.name}_`, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*📱️ Ваш номер телефону:* _${data?.numberphone}_`, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*🏙️ Ваше місто:* _${data?.city}_`, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*📍 Ваша адреса:* _${data?.street}_`, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*🚕 Метод доставки:* _${deliveryMethodText}_`, { parse_mode: 'Markdown' });
+      // Відправка повідомлень
+      await bot.sendMessage(chatId, "*Дякуємо за надану інформацію!*", {
+        parse_mode: "Markdown",
+      });
+      await bot.sendMessage(chatId, `*👤️ Ваше ПІБ:* _${data?.name}_`, {
+        parse_mode: "Markdown",
+      });
+      await bot.sendMessage(
+        chatId,
+        `*📱️ Ваш номер телефону:* _${data?.numberphone}_`,
+        { parse_mode: "Markdown" }
+      );
+      await bot.sendMessage(chatId, `*🏙️ Ваше місто:* _${data?.city}_`, {
+        parse_mode: "Markdown",
+      });
+      await bot.sendMessage(chatId, `*📍 Ваша адреса:* _${data?.street}_`, {
+        parse_mode: "Markdown",
+      });
+      await bot.sendMessage(
+        chatId,
+        `*🚕 Метод доставки:* _${deliveryMethodText}_`,
+        { parse_mode: "Markdown" }
+      );
 
-     if (data.deliveryMethod !== "pickup") {
+      if (data.deliveryMethod !== "pickup") {
+        // Тільки для методу доставки, який не є самовивозом
         let deliveryTimeText = data.deliveryTime
           ? data.deliveryTime.startsWith
             ? `${data.deliveryTime}`
@@ -118,7 +136,7 @@ bot.on('message', async (msg) => {
 
         await bot.sendMessage(
           chatId,
-          `*💵 Вартість доставки:* _${price}_`, 
+          `*💵 Вартість доставки:* _${price}_`, // Используем ее
           { parse_mode: "Markdown" }
         );
         await bot.sendMessage(
@@ -130,18 +148,28 @@ bot.on('message', async (msg) => {
           }_`,
           { parse_mode: "Markdown" }
         );
+      } else {
+        // Додаткова інформація для самовивозу
+        await bot.sendMessage(
+          chatId,
+          `*📍 Адреса для самовивозу:* _вулиця Руська, 209-Б, Чернівці, Чернівецька область, Україна_`,
+          { parse_mode: "Markdown" }
+        );
       }
 
       setTimeout(async () => {
-        await bot.sendMessage(chatId, 'Заходьте в наш інтернет магазин за кнопкою нижче', {
-          reply_markup: {
-            inline_keyboard: [
-              [{ text: 'Зробити замовлення', web_app: { url: webAppUrl } }],
-            ]
+        await bot.sendMessage(
+          chatId,
+          "Заходьте в наш інтернет магазин за кнопкою нижче",
+          {
+            reply_markup: {
+              inline_keyboard: [
+                [{ text: "Зробити замовлення", web_app: { url: webAppUrl } }],
+              ],
+            },
           }
-        });
-      }, 3000); 
-
+        );
+      }, 3000);
     } catch (e) {
       console.error(e);
     }
