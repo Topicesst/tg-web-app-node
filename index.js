@@ -48,12 +48,13 @@ bot.on('message', async (msg) => {
 
   if (text === '/start') {
     
-    try {
+   try {
       let user = "";
 
       const firstName = msg.from.first_name || " ";
       const lastName = msg.from.last_name || " ";
       const userId = msg.from.id;
+      
       const tmpId = Math.random().toString(36).substring(4);
       const date = new Date();
       const textDate = date.getHours() + ':' + date.getMinutes() + '  ' + date.getDate() + '.' + date.getMonth() + '.' + date.getFullYear();
@@ -62,7 +63,8 @@ bot.on('message', async (msg) => {
         lastName: lastName,
         id: userId,        
         isChecked: true,
-        date: textDate
+        date: textDate,
+        isChecked: true
       };
 
       const usersRef = collection(db, "users");
