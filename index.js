@@ -11,8 +11,8 @@ const firebaseConfig = {
   projectId: "tg-web-app-bot-8d79b",
   storageBucket: "tg-web-app-bot-8d79b.appspot.com",
   messagingSenderId: "494356709244",
-  appId: "1:494356709244:web:9971a4abec3a90256d6ef9",
-  measurementId: "G-DMJKG8X1KY"
+  appId: "1:494356709244:web:d12c89285dac6add6d6ef9",
+  measurementId: "G-M9J3RSM23P"
 };
 
 const fbapp = initializeApp(firebaseConfig);
