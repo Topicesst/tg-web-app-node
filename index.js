@@ -6,13 +6,13 @@ const { initializeApp } = require('firebase/app');
 const { getFirestore, doc, setDoc, collection, collectionGroup } = require('firebase/firestore');
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAIN5YHKjJk6eCU00XEjGkrFHrxQyITgd4",
-  authDomain: "tg-web-app-bot-8d79b.firebaseapp.com",
-  projectId: "tg-web-app-bot-8d79b",
-  storageBucket: "tg-web-app-bot-8d79b.appspot.com",
-  messagingSenderId: "494356709244",
-  appId: "1:494356709244:web:d12c89285dac6add6d6ef9",
-  measurementId: "G-M9J3RSM23P"
+  apiKey: "AIzaSyDgX6-udKrNWbG2fvA7Czc667S9n-nqOEk",
+  authDomain: "tg-web-app-data-base.firebaseapp.com",
+  projectId: "tg-web-app-data-base",
+  storageBucket: "tg-web-app-data-base.appspot.com",
+  messagingSenderId: "193829235520",
+  appId: "1:193829235520:web:48f285016b60dad1ea68a5",
+  measurementId: "G-HFBWVC29D1"
 };
 
 const fbapp = initializeApp(firebaseConfig);
