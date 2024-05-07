@@ -54,7 +54,6 @@ bot.on("message", async (msg) => {
       const data = JSON.parse(msg.web_app_data.data);
       price = data.deliveryPrice; // Оновлення ціни доставки
 
-      // Обробка даних замовлення
       const userId = msg.from.id;
       const order = {
         name: data.name,
@@ -64,16 +63,35 @@ bot.on("message", async (msg) => {
         deliveryMethod: data.deliveryMethod,
         deliveryCost: price,
         deliveryTime: data.deliveryTime,
-        timestamp: new Date().toISOString() // Час створення замовлення
+        timestamp: new Date().toISOString()
       };
 
-      // Зберігання замовлення в базі даних Firestore
       const usersRef = doc(db, "users", userId.toString());
       const ordersRef = collection(usersRef, "orders");
       await setDoc(doc(ordersRef), order);
 
-      // Відправлення інформації назад у чат Telegram
-      await bot.sendMessage(chatId, "Ваше замовлення успішно збережено!", { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, '*Дякуємо за надану інформацію!*', { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*👤️ Ваше ПІБ:* _${data.name}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*📱️ Ваш номер телефону:* _${data.numberphone}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*🏙️ Ваше місто:* _${data.city}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*📍 Ваша адреса:* _${data.street}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*🚕 Метод доставки:* _${data.deliveryMethod}_`, { parse_mode: 'Markdown' });
+
+      if (data.deliveryMethod !== "pickup") {
+        await bot.sendMessage(chatId, `*💵 Вартість доставки:* _${price}_₴`, { parse_mode: "Markdown" });
+        await bot.sendMessage(chatId, `*⌚ Приблизний час доставки:* _${data.deliveryTime}_`, { parse_mode: "Markdown" });
+      }
+
+      setTimeout(async () => {
+        await bot.sendMessage(chatId, 'Заходьте в наш інтернет магазин за кнопкою нижче', {
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: 'Зробити замовлення', web_app: { url: webAppUrl } }],
+            ]
+          }
+        });
+      }, 3000); 
+
     } catch (e) {
       console.error(e);
       await bot.sendMessage(chatId, "Сталася помилка під час обробки вашого замовлення.");
@@ -83,7 +101,7 @@ bot.on("message", async (msg) => {
 
 app.post('/web-data', async (req, res) => {
   const { queryId, products, totalPrice } = req.body;
-  let deliveryPrice = req.body.deliveryPrice;
+  let deliveryPrice = req.body.deliveryPrice; 
 
   if (typeof deliveryPrice === 'string') {
     deliveryPrice = parseFloat(deliveryPrice.replace(/[^\d.]/g, ''));
