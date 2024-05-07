@@ -77,6 +77,7 @@ bot.on("message", async (msg) => {
   }
 });
 
+   if (text === "/start") {
     await bot.sendMessage(chatId, "Нижче з'явиться кнопка, заповніть форму", {
       reply_markup: {
         keyboard: [
