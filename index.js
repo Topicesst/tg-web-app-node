@@ -82,16 +82,34 @@ let deliveryMethodText = '';
       const ordersRef = collection(usersRef, "orders");
       await setDoc(doc(ordersRef), order);
 
-      await bot.sendMessage(chatId, '*Дякуємо за надану інформацію!*', { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*👤️ Ваше ПІБ:* _${data.name}_`, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*📱️ Ваш номер телефону:* _${data.numberphone}_`, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*🏙️ Ваше місто:* _${data.city}_`, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*📍 Ваша адреса:* _${data.street}_`, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*🚕 Метод доставки:* _${data.deliveryMethodText}_`, { parse_mode: 'Markdown' });
+     await bot.sendMessage(chatId, '*Дякуємо за надану інформацію!*', { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*👤️ Ваше ПІБ:* _${data?.name}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*📱️ Ваш номер телефону:* _${data?.numberphone}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*🏙️ Ваше місто:* _${data?.city}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*📍 Ваша адреса:* _${data?.street}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*🚕 Метод доставки:* _${deliveryMethodText}_`, { parse_mode: 'Markdown' });
 
-      if (data.deliveryMethod !== "pickup") {
-        await bot.sendMessage(chatId, `*💵 Вартість доставки:* _${price}_₴`, { parse_mode: "Markdown" });
-        await bot.sendMessage(chatId, `*⌚ Приблизний час доставки:* _${data.deliveryMethodText}_`, { parse_mode: "Markdown" });
+     if (data.deliveryMethod !== "pickup") {
+        let deliveryTimeText = data.deliveryTime
+          ? data.deliveryTime.startsWith
+            ? `${data.deliveryTime}`
+            : `${data.deliveryTime}`
+          : "Час доставки не вказано";
+
+        await bot.sendMessage(
+          chatId,
+          `*💵 Вартість доставки:* _${price}_`, 
+          { parse_mode: "Markdown" }
+        );
+        await bot.sendMessage(
+          chatId,
+          `*⌚ Приблизний час доставки:* _${
+            data.deliveryTime
+              ? `${data.deliveryTime}`
+              : "Час доставки не вказано"
+          }_`,
+          { parse_mode: "Markdown" }
+        );
       }
 
       setTimeout(async () => {
