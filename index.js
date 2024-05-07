@@ -79,7 +79,7 @@ bot.on("message", async (msg) => {
 
       if (data.deliveryMethod !== "pickup") {
         await bot.sendMessage(chatId, `*💵 Вартість доставки:* _${price}_₴`, { parse_mode: "Markdown" });
-        await bot.sendMessage(chatId, `*⌚ Приблизний час доставки:* _${data.deliveryTime}_`, { parse_mode: "Markdown" });
+        await bot.sendMessage(chatId, `*⌚ Приблизний час доставки:* _${data.deliveryMethodText}_`, { parse_mode: "Markdown" });
       }
 
       setTimeout(async () => {
