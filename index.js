@@ -54,6 +54,18 @@ bot.on("message", async (msg) => {
       const data = JSON.parse(msg.web_app_data.data);
       price = data.deliveryPrice; // Оновлення ціни доставки
 
+let deliveryMethodText = '';
+      switch(data.deliveryMethod) {
+        case 'courier':
+          deliveryMethodText = 'Доставка кур\'єром';
+          break;
+        case 'pickup':
+          deliveryMethodText = 'Самовивіз';
+          break;
+        default:
+          deliveryMethodText = 'Метод доставки не вибрано';
+      }
+
       const userId = msg.from.id;
       const order = {
         name: data.name,
