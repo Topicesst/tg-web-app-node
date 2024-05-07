@@ -46,32 +46,36 @@ bot.on("message", async (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text;
 
-  if (text === "/start") {
-
+  if (msg?.web_app_data?.data) {
     try {
-      let user = "";
+      const data = JSON.parse(msg.web_app_data.data);
 
-      const firstName = msg.from.first_name || " ";
-      const lastName = msg.from.last_name || " ";
+      // Отримання ID користувача та створення об'єкта замовлення
       const userId = msg.from.id;
-      
-      const tmpId = Math.random().toString(36).substring(4);
-      const date = new Date();
-      const textDate = date.getHours() + ':' + date.getMinutes() + '  ' + date.getDate() + '.' + date.getMonth() + '.' + date.getFullYear();
-      user = {        
-        firstName: firstName,
-        lastName: lastName,
-        id: userId,        
-        isChecked: '_UserWasChecked_0777',
-        date: textDate
+      const order = {
+        name: data.name,
+        phone: data.numberphone,
+        city: data.city,
+        address: data.street,
+        deliveryMethod: data.deliveryMethod,
+        deliveryCost: price,
+        deliveryTime: data.deliveryTime,
+        timestamp: new Date().toISOString() // Час створення замовлення
       };
 
-      const usersRef = collection(db, "users");
-      await setDoc(doc(usersRef, tmpId), user);
-      
-    } catch (error) {
-      console.log(error);
+      // Зберігання замовлення в базі даних Firestore
+      const usersRef = doc(db, "users", userId.toString());
+      const ordersRef = collection(usersRef, "orders");
+      await setDoc(doc(ordersRef), order);
+
+      // Відправлення інформації назад у чат Telegram
+      await bot.sendMessage(chatId, "Ваше замовлення успішно збережено!", { parse_mode: 'Markdown' });
+    } catch (e) {
+      console.error(e);
+      await bot.sendMessage(chatId, "Сталася помилка під час обробки вашого замовлення.");
     }
+  }
+});
 
     await bot.sendMessage(chatId, "Нижче з'явиться кнопка, заповніть форму", {
       reply_markup: {
