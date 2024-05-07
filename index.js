@@ -54,18 +54,6 @@ bot.on("message", async (msg) => {
       const data = JSON.parse(msg.web_app_data.data);
       price = data.deliveryPrice; // Оновлення ціни доставки
 
-let deliveryMethodText = '';
-      switch(data.deliveryMethod) {
-        case 'courier':
-          deliveryMethodText = 'Доставка кур\'єром';
-          break;
-        case 'pickup':
-          deliveryMethodText = 'Самовивіз';
-          break;
-        default:
-          deliveryMethodText = 'Метод доставки не вибрано';
-      }
-
       const userId = msg.from.id;
       const order = {
         name: data.name,
@@ -82,7 +70,19 @@ let deliveryMethodText = '';
       const ordersRef = collection(usersRef, "orders");
       await setDoc(doc(ordersRef), order);
 
-     await bot.sendMessage(chatId, '*Дякуємо за надану інформацію!*', { parse_mode: 'Markdown' });
+let deliveryMethodText = '';
+      switch(data.deliveryMethod) {
+        case 'courier':
+          deliveryMethodText = 'Доставка кур\'єром';
+          break;
+        case 'pickup':
+          deliveryMethodText = 'Самовивіз';
+          break;
+        default:
+          deliveryMethodText = 'Метод доставки не вибрано';
+      }
+
+      await bot.sendMessage(chatId, '*Дякуємо за надану інформацію!*', { parse_mode: 'Markdown' });
       await bot.sendMessage(chatId, `*👤️ Ваше ПІБ:* _${data?.name}_`, { parse_mode: 'Markdown' });
       await bot.sendMessage(chatId, `*📱️ Ваш номер телефону:* _${data?.numberphone}_`, { parse_mode: 'Markdown' });
       await bot.sendMessage(chatId, `*🏙️ Ваше місто:* _${data?.city}_`, { parse_mode: 'Markdown' });
