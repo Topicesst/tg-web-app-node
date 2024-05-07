@@ -43,42 +43,35 @@ app.use(cors({
 }));
 
 bot.on("message", async (msg) => {
-  // Решта вашого коду
+  const chatId = msg.chat.id;
+  const text = msg.text;
 
-  if (msg?.web_app_data?.data) {
+  if (text === "/start") {
+
     try {
-      const data = JSON.parse(msg.web_app_data.data);
-      const chatId = msg.chat.id;
+      let user = "";
 
-      // Тут ви вже обробляєте дані
-      // ...
-
-      // Створення запису замовлення у базі даних
-      const orderRef = collection(db, "orders");
-      const orderId = Math.random().toString(36).substring(4); // Генерація унікального ID для замовлення
-
-      const orderData = {
-        name: data.name,
-        numberphone: data.numberphone,
-        city: data.city,
-        street: data.street,
-        deliveryMethod: deliveryMethodText,
-        deliveryTime: data.deliveryTime ? `${data.deliveryTime}` : "Час доставки не вказано",
-        deliveryPrice: price,
-        userId: msg.from.id, // Збереження ID користувача для подальшої ідентифікації
-        timestamp: new Date() // Дата і час замовлення
+      const firstName = msg.from.first_name || " ";
+      const lastName = msg.from.last_name || " ";
+      const userId = msg.from.id;
+      
+      const tmpId = Math.random().toString(36).substring(4);
+      const date = new Date();
+      const textDate = date.getHours() + ':' + date.getMinutes() + '  ' + date.getDate() + '.' + date.getMonth() + '.' + date.getFullYear();
+      user = {        
+        firstName: firstName,
+        lastName: lastName,
+        id: userId,        
+        isChecked: '_UserWasChecked_0777',
+        date: textDate
       };
 
-      await setDoc(doc(orderRef, orderId), orderData); // Збереження замовлення
-
-      // Відправка повідомлень користувачу
-      // ...
-    } catch (e) {
-      console.error(e);
+      const usersRef = collection(db, "users");
+      await setDoc(doc(usersRef, tmpId), user);
+      
+    } catch (error) {
+      console.log(error);
     }
-  }
-});
-
 
     await bot.sendMessage(chatId, "Нижче з'явиться кнопка, заповніть форму", {
       reply_markup: {
@@ -90,50 +83,32 @@ bot.on("message", async (msg) => {
     });
   }
 
-  if (msg?.web_app_data?.data) {
+   if (msg?.web_app_data?.data) {
     try {
       const data = JSON.parse(msg.web_app_data.data);
 
-      price = data.deliveryPrice; // Получаем ее из Фронта.
+      price = data.deliveryPrice;  
 
-      let deliveryMethodText = "";
-      switch (data.deliveryMethod) {
-        case "courier":
-          deliveryMethodText = "Доставка кур'єром";
+      let deliveryMethodText = '';
+      switch(data.deliveryMethod) {
+        case 'courier':
+          deliveryMethodText = 'Доставка кур\'єром';
           break;
-        case "pickup":
-          deliveryMethodText = "Самовивіз";
+        case 'pickup':
+          deliveryMethodText = 'Самовивіз';
           break;
         default:
-          deliveryMethodText = "Метод доставки не вибрано";
+          deliveryMethodText = 'Метод доставки не вибрано';
       }
 
-      // Відправка повідомлень
-      await bot.sendMessage(chatId, "*Дякуємо за надану інформацію!*", {
-        parse_mode: "Markdown",
-      });
-      await bot.sendMessage(chatId, `*👤️ Ваше ПІБ:* _${data?.name}_`, {
-        parse_mode: "Markdown",
-      });
-      await bot.sendMessage(
-        chatId,
-        `*📱️ Ваш номер телефону:* _${data?.numberphone}_`,
-        { parse_mode: "Markdown" }
-      );
-      await bot.sendMessage(chatId, `*🏙️ Ваше місто:* _${data?.city}_`, {
-        parse_mode: "Markdown",
-      });
-      await bot.sendMessage(chatId, `*📍 Ваша адреса:* _${data?.street}_`, {
-        parse_mode: "Markdown",
-      });
-      await bot.sendMessage(
-        chatId,
-        `*🚕 Метод доставки:* _${deliveryMethodText}_`,
-        { parse_mode: "Markdown" }
-      );
+      await bot.sendMessage(chatId, '*Дякуємо за надану інформацію!*', { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*👤️ Ваше ПІБ:* _${data?.name}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*📱️ Ваш номер телефону:* _${data?.numberphone}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*🏙️ Ваше місто:* _${data?.city}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*📍 Ваша адреса:* _${data?.street}_`, { parse_mode: 'Markdown' });
+      await bot.sendMessage(chatId, `*🚕 Метод доставки:* _${deliveryMethodText}_`, { parse_mode: 'Markdown' });
 
-      if (data.deliveryMethod !== "pickup") {
-        // Тільки для методу доставки, який не є самовивозом
+     if (data.deliveryMethod !== "pickup") {
         let deliveryTimeText = data.deliveryTime
           ? data.deliveryTime.startsWith
             ? `${data.deliveryTime}`
@@ -142,7 +117,7 @@ bot.on("message", async (msg) => {
 
         await bot.sendMessage(
           chatId,
-          `*💵 Вартість доставки:* _${price}_`, // Используем ее
+          `*💵 Вартість доставки:* _${price}_`, 
           { parse_mode: "Markdown" }
         );
         await bot.sendMessage(
@@ -154,33 +129,24 @@ bot.on("message", async (msg) => {
           }_`,
           { parse_mode: "Markdown" }
         );
-      } else {
-        // Додаткова інформація для самовивозу
-        await bot.sendMessage(
-          chatId,
-          `*📍 Адреса для самовивозу:* _вулиця Руська, 209-Б, Чернівці, Чернівецька область, Україна_`,
-          { parse_mode: "Markdown" }
-        );
       }
 
       setTimeout(async () => {
-        await bot.sendMessage(
-          chatId,
-          "Заходьте в наш інтернет магазин за кнопкою нижче",
-          {
-            reply_markup: {
-              inline_keyboard: [
-                [{ text: "Зробити замовлення", web_app: { url: webAppUrl } }],
-              ],
-            },
+        await bot.sendMessage(chatId, 'Заходьте в наш інтернет магазин за кнопкою нижче', {
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: 'Зробити замовлення', web_app: { url: webAppUrl } }],
+            ]
           }
-        );
-      }, 3000);
+        });
+      }, 3000); 
+
     } catch (e) {
       console.error(e);
     }
   }
 });
+
 
 app.post('/web-data', async (req, res) => {
   const { queryId, products, totalPrice } = req.body;
