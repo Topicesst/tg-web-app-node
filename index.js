@@ -105,6 +105,7 @@ app.post('/web-data', async (req, res) => {
 
   if (typeof deliveryPrice === 'string') {
     deliveryPrice = parseFloat(deliveryPrice.replace(/[^\d.]/g, ''));
+    deliveryPrice = parseFloat(deliveryPrice);
   }
 
   if (isNaN(deliveryPrice)) {
@@ -123,8 +124,8 @@ app.post('/web-data', async (req, res) => {
         message_text: [
           '*Вітаємо з покупкою!*',
           `*Сума замовлення:* _${numericTotalPrice.toFixed(2)}₴_`,
-          `*Вартість доставки:* _${deliveryPrice}₴_`,
-          `*Загальна сума оплати:* _${totalOrderPrice.toFixed(2)}₴_`,
+          `*Вартість доставки:* _${price}₴_`,
+         `*Загальна сума оплати:* _${parseInt(totalPrice) + parseInt(price)}₴_`,
           '*Що саме ви замовили:*',
           ...products.map(item => `• _${item.title}_`)
         ].join('\n'),
