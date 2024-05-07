@@ -44,34 +44,43 @@ app.use(cors({
 
 bot.on("message", async (msg) => {
   const chatId = msg.chat.id;
-  const text = msg.text;
-
-  if (text === "/start") {
-
+  
+  if (msg?.web_app_data?.data) {
     try {
-      let user = "";
-
-      const firstName = msg.from.first_name || " ";
-      const lastName = msg.from.last_name || " ";
-      const userId = msg.from.id;
-      
-      const tmpId = Math.random().toString(36).substring(4);
+      const data = JSON.parse(msg.web_app_data.data);
       const date = new Date();
-      const textDate = date.getHours() + ':' + date.getMinutes() + '  ' + date.getDate() + '.' + date.getMonth() + '.' + date.getFullYear();
-      user = {        
-        firstName: firstName,
-        lastName: lastName,
-        id: userId,        
-        isChecked: '_UserWasChecked_0777',
-        date: textDate
+      const dateStr = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+      const timeStr = `${date.getHours()}:${date.getMinutes()}`;
+
+      // Збереження інформації про користувача
+      const userData = {
+        name: data.name,
+        phone: data.numberphone,
+        city: data.city,
+        address: data.street,
+        deliveryMethod: data.deliveryMethod,
+        deliveryPrice: price,
+        deliveryTime: data.deliveryTime || "Час доставки не вказано",
+        orderDate: dateStr,
+        orderTime: timeStr
       };
 
       const usersRef = collection(db, "users");
-      await setDoc(doc(usersRef, tmpId), user);
-      
-    } catch (error) {
-      console.log(error);
-    }
+      const userId = msg.from.id.toString(); // Використовуємо ID користувача як унікальний ключ
+      await setDoc(doc(usersRef, userId), userData, { merge: true });
+
+      // Збереження деталей замовлення
+      const ordersRef = collection(db, "orders");
+      const orderId = `${userId}_${date.getTime()}`; // Створюємо унікальний ID для замовлення
+      const orderData = {
+        userId: userId,
+        products: data.products, // Передбачається, що в data є поле products
+        totalPrice: data.totalPrice,
+        deliveryPrice: price,
+        orderDate: dateStr,
+        orderTime: timeStr
+      };
+      await setDoc(doc(ordersRef, orderId), orderData);
 
     await bot.sendMessage(chatId, "Нижче з'явиться кнопка, заповніть форму", {
       reply_markup: {
