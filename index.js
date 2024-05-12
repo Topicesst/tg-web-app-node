@@ -37,8 +37,45 @@ app.use(cors({
 bot.on("message", async (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text;
+  userIdGlobal = msg.from.id;
 
   if (text === "/start") {
+    console.log("Start + " + JSON.stringify(msg));
+
+    try {
+      let user = "";
+
+      const firstName = msg.from.first_name || " ";
+      const lastName = msg.from.last_name || " ";
+      const userId = msg.from.id;
+
+      const tmpId = Math.random().toString(36).substring(4);
+      const date = new Date();
+      const textDate =
+        date.getHours() +
+        ":" +
+        date.getMinutes() +
+        "  " +
+        date.getDate() +
+        "." +
+        date.getMonth() +
+        "." +
+        date.getFullYear();
+      user = {
+        firstName: firstName,
+        lastName: lastName,
+        id: userId,
+        isChecked: "_UserWasChecked_0777",
+        date: textDate,
+        orders: []
+      };
+
+      const usersRef = collection(db, "users");
+      await setDoc(doc(usersRef, tmpId), user);
+    } catch (error) {
+      console.log(error);
+    }
+
     await bot.sendMessage(chatId, "Нижче з'явиться кнопка, заповніть форму", {
       reply_markup: {
         keyboard: [
@@ -52,44 +89,47 @@ bot.on("message", async (msg) => {
   if (msg?.web_app_data?.data) {
     try {
       const data = JSON.parse(msg.web_app_data.data);
-      price = data.deliveryPrice; // Оновлення ціни доставки
 
-      const userId = msg.from.id;
-      const order = {
-        name: data.name,
-        phone: data.numberphone,
-        city: data.city,
-        address: data.street,
-        deliveryMethod: data.deliveryMethod,
-        deliveryCost: price,
-        deliveryTime: data.deliveryTime,
-        timestamp: new Date().toISOString()
-      };
+      price = data.deliveryPrice; // Получаем ее из Фронта.
 
-      const usersRef = doc(db, "users", userId.toString());
-      const ordersRef = collection(usersRef, "orders");
-      await setDoc(doc(ordersRef), order);
-
-let deliveryMethodText = '';
-      switch(data.deliveryMethod) {
-        case 'courier':
-          deliveryMethodText = 'Доставка кур\'єром';
+      let deliveryMethodText = "";
+      switch (data.deliveryMethod) {
+        case "courier":
+          deliveryMethodText = "Доставка кур'єром";
           break;
-        case 'pickup':
-          deliveryMethodText = 'Самовивіз';
+        case "pickup":
+          deliveryMethodText = "Самовивіз";
           break;
         default:
-          deliveryMethodText = 'Метод доставки не вибрано';
+          deliveryMethodText = "Метод доставки не вибрано";
       }
 
-      await bot.sendMessage(chatId, '*Дякуємо за надану інформацію!*', { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*👤️ Ваше ПІБ:* _${data?.name}_`, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*📱️ Ваш номер телефону:* _${data?.numberphone}_`, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*🏙️ Ваше місто:* _${data?.city}_`, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*📍 Ваша адреса:* _${data?.street}_`, { parse_mode: 'Markdown' });
-      await bot.sendMessage(chatId, `*🚕 Метод доставки:* _${deliveryMethodText}_`, { parse_mode: 'Markdown' });
+      // Відправка повідомлень
+      await bot.sendMessage(chatId, "*Дякуємо за надану інформацію!*", {
+        parse_mode: "Markdown",
+      });
+      await bot.sendMessage(chatId, `*👤️ Ваше ПІБ:* _${data?.name}_`, {
+        parse_mode: "Markdown",
+      });
+      await bot.sendMessage(
+        chatId,
+        `*📱️ Ваш номер телефону:* _${data?.numberphone}_`,
+        { parse_mode: "Markdown" }
+      );
+      await bot.sendMessage(chatId, `*🏙️ Ваше місто:* _${data?.city}_`, {
+        parse_mode: "Markdown",
+      });
+      await bot.sendMessage(chatId, `*📍 Ваша адреса:* _${data?.street}_`, {
+        parse_mode: "Markdown",
+      });
+      await bot.sendMessage(
+        chatId,
+        `*🚕 Метод доставки:* _${deliveryMethodText}_`,
+        { parse_mode: "Markdown" }
+      );
 
-     if (data.deliveryMethod !== "pickup") {
+      if (data.deliveryMethod !== "pickup") {
+        // Тільки для методу доставки, який не є самовивозом
         let deliveryTimeText = data.deliveryTime
           ? data.deliveryTime.startsWith
             ? `${data.deliveryTime}`
@@ -98,7 +138,7 @@ let deliveryMethodText = '';
 
         await bot.sendMessage(
           chatId,
-          `*💵 Вартість доставки:* _${price}_`, 
+          `*💵 Вартість доставки:* _${price}_`, // Используем ее
           { parse_mode: "Markdown" }
         );
         await bot.sendMessage(
@@ -110,67 +150,82 @@ let deliveryMethodText = '';
           }_`,
           { parse_mode: "Markdown" }
         );
+      } else {
+        // Додаткова інформація для самовивозу
+        await bot.sendMessage(
+          chatId,
+          `*📍 Адреса для самовивозу:* _вулиця Руська, 209-Б, Чернівці, Чернівецька область, Україна_`,
+          { parse_mode: "Markdown" }
+        );
       }
 
       setTimeout(async () => {
-        await bot.sendMessage(chatId, 'Заходьте в наш інтернет магазин за кнопкою нижче', {
-          reply_markup: {
-            inline_keyboard: [
-              [{ text: 'Зробити замовлення', web_app: { url: webAppUrl } }],
-            ]
+        await bot.sendMessage(
+          chatId,
+          "Заходьте в наш інтернет магазин за кнопкою нижче",
+          {
+            reply_markup: {
+              inline_keyboard: [
+                [{ text: "Зробити замовлення", web_app: { url: webAppUrl } }],
+              ],
+            },
           }
-        });
-      }, 3000); 
-
+        );
+      }, 3000);
     } catch (e) {
       console.error(e);
-      await bot.sendMessage(chatId, "Сталася помилка під час обробки вашого замовлення.");
     }
   }
 });
 
-app.post('/web-data', async (req, res) => {
-  const { queryId, products, totalPrice } = req.body;
-  let deliveryPrice = req.body.deliveryPrice; 
-
-  if (typeof deliveryPrice === 'string') {
-    deliveryPrice = parseFloat(deliveryPrice.replace(/[^\d.]/g, ''));
-    deliveryPrice = parseFloat(deliveryPrice);
-  }
-
-  if (isNaN(deliveryPrice)) {
-    deliveryPrice = 0;
-  }
-
-  const numericTotalPrice = parseFloat(totalPrice);
-  const totalOrderPrice = numericTotalPrice + deliveryPrice;
-
+app.post("/web-data", async (req, res) => {
+  const { queryId, products = [], totalPrice } = req.body;
+  // Вывод на экран информации о заказе, который пришел с фронта
   try {
     await bot.answerWebAppQuery(queryId, {
-      type: 'article',
+      type: "article",
       id: queryId,
-      title: 'Успішна покупка',
+      title: "Успішна покупка",
       input_message_content: {
         message_text: [
-          '*Вітаємо з покупкою!*',
-          `*Сума замовлення:* _${numericTotalPrice.toFixed(2)}₴_`,
-          `*Вартість доставки:* _${price}₴_`,
-         `*Загальна сума оплати:* _${parseInt(totalPrice) + parseInt(price)}₴_`,
-          '*Що саме ви замовили:*',
-          ...products.map(item => `• _${item.title}_`)
-        ].join('\n'),
-        parse_mode: 'Markdown'
-      }
+          "*Вітаємо з покупкою!*",
+          `*Сума замовлення:* _${totalPrice}₴_`,
+          `*Вартість доставки:* _${price}₴_`, // Используем ее еще раз
+          `*Загальна сума оплати:* _${
+            parseInt(totalPrice) + parseInt(price)
+          }₴_`,
+          "*Що саме ви замовили:*",
+          ...products.map((item) => `• _${item.title}_`),
+        ].join("\n"),
+        parse_mode: "Markdown",
+      },
     });
-
-    res.status(200).json({});
   } catch (e) {
     console.error(e);
-    res.status(500).json({ error: e.message });
+    res.status(500).json({});
   }
+
+  // Попытка обновления массива заказов Юзера в базе
+  try {
+    const docRef = doc(db, "users", userIdGlobal);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      await updateDoc(docRef, {
+        orders: arrayUnion({
+          date: new Date(),
+          productsList: products,
+          price: totalPrice,
+        }),
+      });
+
+      // console.log("Document data:", docSnap.data());
+    } else {
+      // docSnap.data() will be undefined in this case
+      // console.log("No such document!");
+    }
+  } catch (error) {}
 });
 
-const PORT = 8000;
-app.listen(PORT, () => {
-  console.log(`Сервер запущено на порту ${PORT}`);
+app.listen(process.env.PORT || 3000, () => {
+  console.log(`Server is running on port ${process.env.PORT}`);
 });
