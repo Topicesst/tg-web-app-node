@@ -221,7 +221,7 @@ bot.on("message", async (msg) => {
         });
       }
     } catch (error) {
-      alert(error);
+      console.log(error);
     }
   }
 });
@@ -279,7 +279,7 @@ app.post("/web-data", async (req, res) => {
       });
     }
   } catch (error) {
-    alert(error);
+    console.log(error);
   }
 });
 
