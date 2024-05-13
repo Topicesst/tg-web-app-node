@@ -102,13 +102,14 @@ bot.on("message", async (msg) => {
   }
 
   if (msg?.web_app_data?.data) {
+
+    const data = JSON.parse(msg.web_app_data.data);
     userIdGlobal = msg.from.id;
-    fioGlobal = msg.name;
-    phoneGlobal = msg.numberphone;
+
+    fioGlobal = data.name;
+    phoneGlobal = data.numberphone;
 
     try {
-      const data = JSON.parse(msg.web_app_data.data);
-
       price = data.deliveryPrice; // Получаем ее из Фронта.
 
       let deliveryMethodText = "";
@@ -213,7 +214,7 @@ bot.on("message", async (msg) => {
       if (idCollectionElement !== "") {
         const addDocRef = doc(db, "users", idCollectionElement);
         await updateDoc(addDocRef, {
-          "fio": fioGlobal ,
+          "fio": fioGlobal,
           "phone": phoneGlobal,
         });
       }
