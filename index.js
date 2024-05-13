@@ -2,7 +2,19 @@ const TelegramBot = require("node-telegram-bot-api");
 const express = require("express");
 const cors = require("cors");
 const { initializeApp } = require('firebase/app');
-const { getFirestore, doc, setDoc, collection } = require('firebase/firestore');
+const {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  collection,
+  collectionGroup,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+  arrayUnion,
+} = require("firebase/firestore");
 
 // Налаштування Firebase
 const firebaseConfig = {
@@ -19,6 +31,7 @@ const fbapp = initializeApp(firebaseConfig);
 const db = getFirestore(fbapp);
 
 let price = 0;
+let userIdGlobal = "";
 
 const token = "6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0";
 const webAppUrl = "https://deft-caramel-01f656.netlify.app/";
@@ -40,7 +53,7 @@ bot.on("message", async (msg) => {
   userIdGlobal = msg.from.id;
 
   if (text === "/start") {
-    console.log("Start + " + JSON.stringify(msg));
+    // console.log("Start + " + JSON.stringify(msg));
 
     try {
       let user = "";
@@ -67,7 +80,7 @@ bot.on("message", async (msg) => {
         id: userId,
         isChecked: "_UserWasChecked_0777",
         date: textDate,
-        orders: []
+        orders: [],
       };
 
       const usersRef = collection(db, "users");
@@ -207,26 +220,34 @@ app.post("/web-data", async (req, res) => {
 
   // Попытка обновления массива заказов Юзера в базе
   try {
-    const docRef = doc(db, "users", userIdGlobal);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      await updateDoc(docRef, {
+    const docRef = collection(db, "users");
+    const q = query(docRef, where("id", "==", userIdGlobal));
+    const querySnapshot = await getDocs(q);
+    let idCollectionElement = "";
+    querySnapshot.forEach((doc) => {
+      // doc.data() is never undefined for query doc snapshots
+      console.log(doc.id, " => ", doc.data());
+      if (doc.data().id === userIdGlobal) {
+        // console.log("TEST");
+        idCollectionElement = doc.id;
+      }
+    });
+
+    if (idCollectionElement !== "") {
+      const addDocRef = doc(db, "users", idCollectionElement);
+      await updateDoc(addDocRef, {
         orders: arrayUnion({
           date: new Date(),
           productsList: products,
           price: totalPrice,
         }),
       });
-
-      // console.log("Document data:", docSnap.data());
-    } else {
-      // docSnap.data() will be undefined in this case
-      // console.log("No such document!");
     }
-  } catch (error) {}
+  } catch (error) {
+    alert(error);
+  }
 });
 
-const PORT = 8000;
-app.listen(PORT, () => {
-  console.log(`Сервер запущено на порту ${PORT}`);
+app.listen(process.env.PORT || 3000, () => {
+  console.log(`Server is running on port ${process.env.PORT}`);
 });
