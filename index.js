@@ -78,9 +78,7 @@ bot.on("message", async (msg) => {
         date.getFullYear();
       user = {
         firstName: firstName,
-        lastName: lastName,
-        fio: "",
-        phone: "",
+        lastName: lastName,        
         id: userId,
         isChecked: "_UserWasChecked_0777",
         date: textDate,
@@ -112,7 +110,6 @@ bot.on("message", async (msg) => {
       const data = JSON.parse(msg.web_app_data.data);
 
       price = data.deliveryPrice; // Получаем ее из Фронта.
-
 
       let deliveryMethodText = "";
       switch (data.deliveryMethod) {
@@ -216,8 +213,8 @@ bot.on("message", async (msg) => {
       if (idCollectionElement !== "") {
         const addDocRef = doc(db, "users", idCollectionElement);
         await updateDoc(addDocRef, {
-          fio: fioGlobal,
-          phone: phoneGlobal,
+          "fio": fioGlobal ,
+          "phone": phoneGlobal,
         });
       }
     } catch (error) {
@@ -279,7 +276,7 @@ app.post("/web-data", async (req, res) => {
       });
     }
   } catch (error) {
-    console.log(error);
+    alert(error);
   }
 });
 
