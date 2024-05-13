@@ -248,6 +248,8 @@ app.post("/web-data", async (req, res) => {
   }
 });
 
-app.listen(process.env.PORT || 3000, () => {
-  console.log(`Server is running on port ${process.env.PORT}`);
+const PORT = 8000;
+app.listen(PORT, () => {
+  console.log(`Сервер запущено на порту ${PORT}`);
 });
+
