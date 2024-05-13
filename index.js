@@ -30,8 +30,11 @@ const firebaseConfig = {
 const fbapp = initializeApp(firebaseConfig);
 const db = getFirestore(fbapp);
 
-let price = 0;
+let price = 0; // Глобальная переменная. Доступ к ней из любой части кода.
 let userIdGlobal = "";
+let dataOrderGlobal = {};
+let fioGlobal = "";
+let phoneGlobal = "";
 
 const token = "6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0";
 const webAppUrl = "https://deft-caramel-01f656.netlify.app/";
@@ -56,8 +59,7 @@ bot.on("message", async (msg) => {
     // console.log("Start + " + JSON.stringify(msg));
 
     try {
-      let user = "";
-
+      let user = {};
       const firstName = msg.from.first_name || " ";
       const lastName = msg.from.last_name || " ";
       const userId = msg.from.id;
@@ -77,6 +79,8 @@ bot.on("message", async (msg) => {
       user = {
         firstName: firstName,
         lastName: lastName,
+        fio: "",
+        phone: "",
         id: userId,
         isChecked: "_UserWasChecked_0777",
         date: textDate,
@@ -100,10 +104,15 @@ bot.on("message", async (msg) => {
   }
 
   if (msg?.web_app_data?.data) {
+    userIdGlobal = msg.from.id;
+    fioGlobal = msg.name;
+    phoneGlobal = msg.numberphone;
+
     try {
       const data = JSON.parse(msg.web_app_data.data);
 
       price = data.deliveryPrice; // Получаем ее из Фронта.
+
 
       let deliveryMethodText = "";
       switch (data.deliveryMethod) {
@@ -188,6 +197,32 @@ bot.on("message", async (msg) => {
     } catch (e) {
       console.error(e);
     }
+
+    // Попытка обновления данных Юзера в базе
+    try {
+      const docRef = collection(db, "users");
+      const q = query(docRef, where("id", "==", userIdGlobal));
+      const querySnapshot = await getDocs(q);
+      let idCollectionElement = "";
+      querySnapshot.forEach((doc) => {
+        // doc.data() is never undefined for query doc snapshots
+        console.log(doc.id, " => ", doc.data());
+        if (doc.data().id === userIdGlobal) {
+          // console.log("TEST");
+          idCollectionElement = doc.id;
+        }
+      });
+
+      if (idCollectionElement !== "") {
+        const addDocRef = doc(db, "users", idCollectionElement);
+        await updateDoc(addDocRef, {
+          fio: fioGlobal,
+          phone: phoneGlobal,
+        });
+      }
+    } catch (error) {
+      alert(error);
+    }
   }
 });
 
@@ -248,8 +283,6 @@ app.post("/web-data", async (req, res) => {
   }
 });
 
-const PORT = 8000;
-app.listen(PORT, () => {
-  console.log(`Сервер запущено на порту ${PORT}`);
+app.listen(process.env.PORT || 3000, () => {
+  console.log(`Server is running on port ${process.env.PORT}`);
 });
-
