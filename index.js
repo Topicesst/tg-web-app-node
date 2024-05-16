@@ -8,7 +8,6 @@ const {
   setDoc,
   getDoc,
   collection,
-  collectionGroup,
   query,
   where,
   getDocs,
@@ -142,7 +141,7 @@ bot.on("message", async (msg) => {
         parse_mode: "Markdown",
       });
       await bot.sendMessage(chatId, `*📍 Ваша адреса:* _${data?.street}_`, {
-        parse_mode: "Markdown",
+        parse_mode: "Markdown"
       });
       await bot.sendMessage(
         chatId,
@@ -216,8 +215,13 @@ bot.on("message", async (msg) => {
       if (idCollectionElement !== "") {
         const addDocRef = doc(db, "users", idCollectionElement);
         await updateDoc(addDocRef, {
-          "fio": fioGlobal,
-          "phone": phoneGlobal,
+          fio: fioGlobal,
+          phone: phoneGlobal,
+          city: data.city,
+          street: data.street,
+          deliveryMethod: deliveryMethodText,
+          price: price,
+          deliveryTime: data.deliveryTime
         });
       }
     } catch (error) {
