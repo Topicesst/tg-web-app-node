@@ -35,6 +35,11 @@ let userIdGlobal = "";
 let dataOrderGlobal = {};
 let fioGlobal = "";
 let phoneGlobal = "";
+let cityGlobal = "";
+let addressGlobal = "";
+let deliveryMethodGlobal = "";
+let deliveryTimeGlobal = "";
+let deliveryPriceGlobal = "";
 
 const token = "6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0";
 const webAppUrl = "https://deft-caramel-01f656.netlify.app/";
@@ -100,44 +105,46 @@ bot.on("message", async (msg) => {
   }
 
   if (msg?.web_app_data?.data) {
-
     const data = JSON.parse(msg.web_app_data.data);
     userIdGlobal = msg.from.id;
 
     fioGlobal = data.name;
     phoneGlobal = data.numberphone;
+    cityGlobal = data.city;
+    addressGlobal = data.street;
+    deliveryMethodGlobal = data.deliveryMethod;
+    deliveryTimeGlobal = data.deliveryTime;
+    deliveryPriceGlobal = data.deliveryPrice;
+    price = data.deliveryPrice;
+
+    let deliveryMethodText = "";
+    switch (deliveryMethodGlobal) {
+      case "courier":
+        deliveryMethodText = "Доставка кур'єром";
+        break;
+      case "pickup":
+        deliveryMethodText = "Самовивіз";
+        break;
+      default:
+        deliveryMethodText = "Метод доставки не вибрано";
+    }
 
     try {
-      price = data.deliveryPrice; // Отримуємо її з фронту.
-
-      let deliveryMethodText = "";
-      switch (data.deliveryMethod) {
-        case "courier":
-          deliveryMethodText = "Доставка кур'єром";
-          break;
-        case "pickup":
-          deliveryMethodText = "Самовивіз";
-          break;
-        default:
-          deliveryMethodText = "Метод доставки не вибрано";
-      }
-
-      // Відправка повідомлень
       await bot.sendMessage(chatId, "*Дякуємо за надану інформацію!*", {
         parse_mode: "Markdown",
       });
-      await bot.sendMessage(chatId, `*👤️ Ваше ПІБ:* _${data?.name}_`, {
+      await bot.sendMessage(chatId, `*👤️ Ваше ПІБ:* _${fioGlobal}_`, {
         parse_mode: "Markdown",
       });
       await bot.sendMessage(
         chatId,
-        `*📱️ Ваш номер телефону:* _${data?.numberphone}_`,
+        `*📱️ Ваш номер телефону:* _${phoneGlobal}_`,
         { parse_mode: "Markdown" }
       );
-      await bot.sendMessage(chatId, `*🏙️ Ваше місто:* _${data?.city}_`, {
+      await bot.sendMessage(chatId, `*🏙️ Ваше місто:* _${cityGlobal}_`, {
         parse_mode: "Markdown",
       });
-      await bot.sendMessage(chatId, `*📍 Ваша адреса:* _${data?.street}_`, {
+      await bot.sendMessage(chatId, `*📍 Ваша адреса:* _${addressGlobal}_`, {
         parse_mode: "Markdown"
       });
       await bot.sendMessage(
@@ -146,30 +153,28 @@ bot.on("message", async (msg) => {
         { parse_mode: "Markdown" }
       );
 
-      if (data.deliveryMethod !== "pickup") {
-        // Тільки для методу доставки, який не є самовивозом
-        let deliveryTimeText = data.deliveryTime
-          ? data.deliveryTime.startsWith
-            ? `${data.deliveryTime}`
-            : `${data.deliveryTime}`
+      if (deliveryMethodGlobal !== "pickup") {
+        let deliveryTimeText = deliveryTimeGlobal
+          ? deliveryTimeGlobal.startsWith
+            ? `${deliveryTimeGlobal}`
+            : `${deliveryTimeGlobal}`
           : "Час доставки не вказано";
 
         await bot.sendMessage(
           chatId,
-          `*💵 Вартість доставки:* _${price}_`, // Використовуємо її
+          `*💵 Вартість доставки:* _${price}_`,
           { parse_mode: "Markdown" }
         );
         await bot.sendMessage(
           chatId,
           `*⌚ Приблизний час доставки:* _${
-            data.deliveryTime
-              ? `${data.deliveryTime}`
+            deliveryTimeGlobal
+              ? `${deliveryTimeGlobal}`
               : "Час доставки не вказано"
           }_`,
           { parse_mode: "Markdown" }
         );
       } else {
-        // Додаткова інформація для самовивозу
         await bot.sendMessage(
           chatId,
           `*📍 Адреса для самовивозу:* _вулиця Руська, 209-Б, Чернівці, Чернівецька область, Україна_`,
@@ -194,15 +199,12 @@ bot.on("message", async (msg) => {
       console.error(e);
     }
 
-    // Спроба оновлення даних користувача в базі
     try {
       const docRef = collection(db, "users");
       const q = query(docRef, where("id", "==", userIdGlobal));
       const querySnapshot = await getDocs(q);
       let idCollectionElement = "";
       querySnapshot.forEach((doc) => {
-        // doc.data() is never undefined for query doc snapshots
-        console.log(doc.id, " => ", doc.data());
         if (doc.data().id === userIdGlobal) {
           idCollectionElement = doc.id;
         }
@@ -213,10 +215,10 @@ bot.on("message", async (msg) => {
         await updateDoc(addDocRef, {
           "fio": fioGlobal,
           "phone": phoneGlobal,
-          "city": data.city,
-          "address": data.street,
+          "city": cityGlobal,
+          "address": addressGlobal,
           "deliveryMethod": deliveryMethodText,
-          "deliveryTime": data.deliveryTime,
+          "deliveryTime": deliveryTimeGlobal,
           "deliveryPrice": price,
         });
       }
@@ -228,7 +230,6 @@ bot.on("message", async (msg) => {
 
 app.post("/web-data", async (req, res) => {
   const { queryId, products = [], totalPrice } = req.body;
-  // Вивід на екран інформації про замовлення, яке прийшло з фронту
   try {
     await bot.answerWebAppQuery(queryId, {
       type: "article",
@@ -238,7 +239,7 @@ app.post("/web-data", async (req, res) => {
         message_text: [
           "*Вітаємо з покупкою!*",
           `*Сума замовлення:* _${totalPrice}₴_`,
-          `*Вартість доставки:* _${price}₴_`, // Використовуємо її ще раз
+          `*Вартість доставки:* _${price}₴_`,
           `*Загальна сума оплати:* _${
             parseInt(totalPrice) + parseInt(price)
           }₴_`,
@@ -253,14 +254,12 @@ app.post("/web-data", async (req, res) => {
     res.status(500).json({});
   }
 
-  // Спроба оновлення масиву замовлень користувача в базі
   try {
     const docRef = collection(db, "users");
     const q = query(docRef, where("id", "==", userIdGlobal));
     const querySnapshot = await getDocs(q);
     let idCollectionElement = "";
     querySnapshot.forEach((doc) => {
-      console.log(doc.id, " => ", doc.data());
       if (doc.data().id === userIdGlobal) {
         idCollectionElement = doc.id;
       }
