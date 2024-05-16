@@ -35,6 +35,7 @@ let userIdGlobal = "";
 let dataOrderGlobal = {};
 let fioGlobal = "";
 let phoneGlobal = "";
+let cityGlobal = "";
 
 const token = "6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0";
 const webAppUrl = "https://deft-caramel-01f656.netlify.app/";
@@ -108,6 +109,7 @@ bot.on("message", async (msg) => {
 
     fioGlobal = data.name;
     phoneGlobal = data.numberphone;
+    cityGlobal = data?.city;
 
     try {
       price = data.deliveryPrice; // Получаем ее из Фронта.
