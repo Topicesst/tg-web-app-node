@@ -109,7 +109,7 @@ bot.on("message", async (msg) => {
 
     fioGlobal = data.name;
     phoneGlobal = data.numberphone;
-    cityGlobal = data?.city;
+    cityGlobal = data.city;
 
     try {
       price = data.deliveryPrice; // Получаем ее из Фронта.
