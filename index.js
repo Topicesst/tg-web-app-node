@@ -30,7 +30,7 @@ const firebaseConfig = {
 const fbapp = initializeApp(firebaseConfig);
 const db = getFirestore(fbapp);
 
-let price = 0; // Глобальная переменная. Доступ к ней из любой части кода.
+let price = 0; // Глобальна змінна. Доступ до неї з будь-якої частини коду.
 let userIdGlobal = "";
 let dataOrderGlobal = {};
 let fioGlobal = "";
@@ -56,8 +56,6 @@ bot.on("message", async (msg) => {
   userIdGlobal = msg.from.id;
 
   if (text === "/start") {
-    // console.log("Start + " + JSON.stringify(msg));
-
     try {
       let user = {};
       const firstName = msg.from.first_name || " ";
@@ -78,7 +76,7 @@ bot.on("message", async (msg) => {
         date.getFullYear();
       user = {
         firstName: firstName,
-        lastName: lastName,        
+        lastName: lastName,
         id: userId,
         isChecked: "_UserWasChecked_0777",
         date: textDate,
@@ -110,7 +108,7 @@ bot.on("message", async (msg) => {
     phoneGlobal = data.numberphone;
 
     try {
-      price = data.deliveryPrice; // Получаем ее из Фронта.
+      price = data.deliveryPrice; // Отримуємо її з фронту.
 
       let deliveryMethodText = "";
       switch (data.deliveryMethod) {
@@ -140,7 +138,7 @@ bot.on("message", async (msg) => {
         parse_mode: "Markdown",
       });
       await bot.sendMessage(chatId, `*📍 Ваша адреса:* _${data?.street}_`, {
-        parse_mode: "Markdown",
+        parse_mode: "Markdown"
       });
       await bot.sendMessage(
         chatId,
@@ -158,7 +156,7 @@ bot.on("message", async (msg) => {
 
         await bot.sendMessage(
           chatId,
-          `*💵 Вартість доставки:* _${price}_`, // Используем ее
+          `*💵 Вартість доставки:* _${price}_`, // Використовуємо її
           { parse_mode: "Markdown" }
         );
         await bot.sendMessage(
@@ -196,7 +194,7 @@ bot.on("message", async (msg) => {
       console.error(e);
     }
 
-    // Попытка обновления данных Юзера в базе
+    // Спроба оновлення даних користувача в базі
     try {
       const docRef = collection(db, "users");
       const q = query(docRef, where("id", "==", userIdGlobal));
@@ -206,7 +204,6 @@ bot.on("message", async (msg) => {
         // doc.data() is never undefined for query doc snapshots
         console.log(doc.id, " => ", doc.data());
         if (doc.data().id === userIdGlobal) {
-          // console.log("TEST");
           idCollectionElement = doc.id;
         }
       });
@@ -216,6 +213,11 @@ bot.on("message", async (msg) => {
         await updateDoc(addDocRef, {
           "fio": fioGlobal,
           "phone": phoneGlobal,
+          "city": data.city,
+          "address": data.street,
+          "deliveryMethod": deliveryMethodText,
+          "deliveryTime": data.deliveryTime,
+          "deliveryPrice": price,
         });
       }
     } catch (error) {
@@ -226,7 +228,7 @@ bot.on("message", async (msg) => {
 
 app.post("/web-data", async (req, res) => {
   const { queryId, products = [], totalPrice } = req.body;
-  // Вывод на экран информации о заказе, который пришел с фронта
+  // Вивід на екран інформації про замовлення, яке прийшло з фронту
   try {
     await bot.answerWebAppQuery(queryId, {
       type: "article",
@@ -236,7 +238,7 @@ app.post("/web-data", async (req, res) => {
         message_text: [
           "*Вітаємо з покупкою!*",
           `*Сума замовлення:* _${totalPrice}₴_`,
-          `*Вартість доставки:* _${price}₴_`, // Используем ее еще раз
+          `*Вартість доставки:* _${price}₴_`, // Використовуємо її ще раз
           `*Загальна сума оплати:* _${
             parseInt(totalPrice) + parseInt(price)
           }₴_`,
@@ -251,17 +253,15 @@ app.post("/web-data", async (req, res) => {
     res.status(500).json({});
   }
 
-  // Попытка обновления массива заказов Юзера в базе
+  // Спроба оновлення масиву замовлень користувача в базі
   try {
     const docRef = collection(db, "users");
     const q = query(docRef, where("id", "==", userIdGlobal));
     const querySnapshot = await getDocs(q);
     let idCollectionElement = "";
     querySnapshot.forEach((doc) => {
-      // doc.data() is never undefined for query doc snapshots
       console.log(doc.id, " => ", doc.data());
       if (doc.data().id === userIdGlobal) {
-        // console.log("TEST");
         idCollectionElement = doc.id;
       }
     });
