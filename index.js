@@ -8,6 +8,7 @@ const {
   setDoc,
   getDoc,
   collection,
+  collectionGroup,
   query,
   where,
   getDocs,
@@ -34,7 +35,6 @@ let userIdGlobal = "";
 let dataOrderGlobal = {};
 let fioGlobal = "";
 let phoneGlobal = "";
-let cityGlobal = "";
 
 const token = "6702075740:AAEDAjNrX1hVS5TJd9NqFYr-8FmQpWY0Lm0";
 const webAppUrl = "https://deft-caramel-01f656.netlify.app/";
@@ -108,7 +108,6 @@ bot.on("message", async (msg) => {
 
     fioGlobal = data.name;
     phoneGlobal = data.numberphone;
-    cityGlobal = data.city;
 
     try {
       price = data.deliveryPrice; // Получаем ее из Фронта.
@@ -141,7 +140,7 @@ bot.on("message", async (msg) => {
         parse_mode: "Markdown",
       });
       await bot.sendMessage(chatId, `*📍 Ваша адреса:* _${data?.street}_`, {
-        parse_mode: "Markdown"
+        parse_mode: "Markdown",
       });
       await bot.sendMessage(
         chatId,
@@ -215,13 +214,8 @@ bot.on("message", async (msg) => {
       if (idCollectionElement !== "") {
         const addDocRef = doc(db, "users", idCollectionElement);
         await updateDoc(addDocRef, {
-          fio: fioGlobal,
-          phone: phoneGlobal,
-          city: data.city,
-          street: data.street,
-          deliveryMethod: deliveryMethodText,
-          price: price,
-          deliveryTime: data.deliveryTime
+          "fio": fioGlobal,
+          "phone": phoneGlobal,
         });
       }
     } catch (error) {
